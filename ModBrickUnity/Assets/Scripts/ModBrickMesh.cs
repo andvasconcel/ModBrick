@@ -12,7 +12,7 @@ namespace ModBrick
 
 		void Start()
 		{
-			Init(0,0,0);
+			Init(1,1,3);
 		}
 
         // for standard full height, input 3
@@ -21,18 +21,22 @@ namespace ModBrick
             _triangles = new List<int>();
             _vertices = new List<Vector3>();
 			_mesh = new Mesh();
-			
-			var topNorthWest = new Vector3(-0.5f, 0.5f, -0.5f);
-			var topNorthEast = new Vector3(0.5f, 0.5f, -0.5f);
-			var topSouthWest = new Vector3(-0.5f, 0.5f, 0.5f);
-			var topSouthEast = new Vector3(0.5f, 0.5f, 0.5f);
 
-			var botNorthWest = new Vector3(-0.5f, -0.5f, -0.5f);
-			var botNorthEast = new Vector3(0.5f, -0.5f, -0.5f);
-			var botSouthWest = new Vector3(-0.5f, -0.5f, 0.5f);
-			var botSouthEast = new Vector3(0.5f, -0.5f, 0.5f);
+			float h = height * ModBrickMetrics.ThirdHeight;
+			float w = width * ModBrickMetrics.Unit;
+			float l = length * ModBrickMetrics.Unit;
 			
-			AddBox(topNorthWest, topNorthEast, topSouthWest, topSouthEast,
+			var topNorthWest = new Vector3(-l/2f, h, -w/2f);
+			var topNorthEast = new Vector3(l/2f, h, -w/2f);
+			var topSouthWest = new Vector3(-l/2f, h, w/2f);
+			var topSouthEast = new Vector3(l/2f, h, w/2f);
+
+			var botNorthWest = new Vector3(-l/2f, 0, -w/2f);
+			var botNorthEast = new Vector3(l/2f, 0, -w/2f);
+			var botSouthWest = new Vector3(-l/2f, 0, w/2f);
+			var botSouthEast = new Vector3(l/2f, 0, w/2f);
+			
+			AddBoxWithoutBottom(topNorthWest, topNorthEast, topSouthWest, topSouthEast,
 				   botNorthWest, botNorthEast, botSouthWest, botSouthEast);
 			
 			_mesh.vertices = _vertices.ToArray();
@@ -40,11 +44,10 @@ namespace ModBrick
 			_filter.mesh = _mesh;
         }
 
-		private void AddBox(Vector3 tnw, Vector3 tne, Vector3 tsw, Vector3 tse,
+		// tnw means top north west, bse means bottom south east...
+		private void AddBoxWithoutBottom(Vector3 tnw, Vector3 tne, Vector3 tsw, Vector3 tse,
 						   Vector3 bnw, Vector3 bne, Vector3 bsw, Vector3 bse)
 		{
-			// tnw means top north west, bse means bottom south east...
-
 			//left  : tnw, tsw, bsw, bnw
 			//front : tne, tnw, bnw, bne
 			//right : tse, tne, bne, bse
@@ -57,7 +60,6 @@ namespace ModBrick
 			AddQuad(tse, tne, bne, bse);
 			AddQuad(tsw, tse, bse, bsw);
 			AddQuad(tnw, tne, tse, tsw);
-			AddQuad(bne, bnw, bsw, bse);
 
 		}
 
