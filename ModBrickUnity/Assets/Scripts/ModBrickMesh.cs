@@ -10,15 +10,43 @@ namespace ModBrick
         private Mesh _mesh;
         [SerializeField] private MeshFilter _filter;
 
+        [SerializeField] private int _length = 1;
+        [SerializeField] private int _width = 1;
+        [SerializeField] private int _height = 1;
+
+        private int Length = -1;
+        private int Width = -1;
+        private int Height = -1;
+
+
         private const int _cylinderSegments = 24;
 
-        void Start()
+        void OnValidate()
         {
-            Init(1, 1, 3);
+            bool remesh = false;
+            if(Length != _length)
+            {
+                Length = _length;
+                remesh = true;
+            }
+            if(Width != _width)
+            {
+                Width = _width;
+                remesh = true;
+            }
+            if(Height != _height)
+            {
+                Height = _height;
+                remesh = true;
+            }
+            if(remesh)
+            {
+                CalculateMesh(Length, Width, Height);
+            }
         }
 
         // for standard full height, input 3
-        public void Init(int length, int width, int height)
+        public void CalculateMesh(int length, int width, int height)
         {
             _triangles = new List<int>();
             _vertices = new List<Vector3>();
@@ -44,12 +72,11 @@ namespace ModBrick
             InnerBox(tnw, tne, tsw, tse,
                     bnw, bne, bsw, bse);
             AddKnobs(length, width, h);
+            
             if (height >= 3)
             {
                 AddTubes(length, width);
             }
-
-
 
             _mesh.vertices = _vertices.ToArray();
             _mesh.triangles = _triangles.ToArray();
@@ -73,6 +100,10 @@ namespace ModBrick
         {
             int tubesX = length - 1;
             int tubesZ = width - 1;
+            if(tubesX+tubesZ < 2)
+            {
+                return;
+            }
             for (int x = 0; x < tubesX; x++)
             {
                 for (int z = 0; z < tubesZ; z++)
