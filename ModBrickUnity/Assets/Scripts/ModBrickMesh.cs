@@ -44,6 +44,7 @@ namespace ModBrick
 			InnerBox(tnw, tne, tsw, tse,
 					bnw, bne, bsw, bse);
 			AddKnobs(length, width, h);
+			AddTube(2,2);
 
 
 			
@@ -65,14 +66,60 @@ namespace ModBrick
 			}
 		}
 
+		private void AddTube(int x, int z)
+		{
+			var xPos = ModBrickMetrics.Unit;
+			var zPos = ModBrickMetrics.Unit;
+			var c = new Vector3(xPos, 0, zPos);
+			float rO = ModBrickMetrics.TubeRadiusOuter;
+			float rI = ModBrickMetrics.TubeRadiusInner;
+			float h = ModBrickMetrics.TubeHeight;
+			for(int i = 0; i < _cylinderSegments; i++)
+			{
+				float rads = (i/(float)_cylinderSegments)*Mathf.PI*2;
+
+				var nextI = Mathf.Repeat(i+1, _cylinderSegments);
+				float nextRads = (nextI/(float)_cylinderSegments)*Mathf.PI*2;
+				// bco = bottom current outer
+				var bco = new Vector3(
+								c.x + rO * Mathf.Cos(rads),
+								c.y,
+								c.z + rO * Mathf.Sin(rads));
+				var bno = new Vector3(
+								c.x + rO * Mathf.Cos(nextRads),
+								c.y,
+								c.z + rO * Mathf.Sin(nextRads));
+				var bci = new Vector3(
+								c.x + rI * Mathf.Cos(rads),
+								c.y,
+								c.z + rI * Mathf.Sin(rads));
+				var bni = new Vector3(
+								c.x + rI * Mathf.Cos(nextRads),
+								c.y,
+								c.z + rI * Mathf.Sin(nextRads));
+
+
+				var tco = new Vector3(bco.x, bco.y + h, bco.z);
+				var tno = new Vector3(bno.x, bno.y + h, bno.z);
+				var tci = new Vector3(bco.x, bco.y + h, bco.z);
+				var tni = new Vector3(bno.x, bno.y + h, bno.z);
+
+
+				AddQuad(bno, tno, tco, bco); // outer side
+				AddQuad(bci, tci, tni, bni); // inner side
+				AddQuad(bni, bno, bco, bci); // bottom
+			}
+
+		}
+
 		private void AddKnob(int x, float height, int z)
 		{
 			var botMid = new Vector3(x*ModBrickMetrics.Unit + ModBrickMetrics.Unit/2, height, z*ModBrickMetrics.Unit + ModBrickMetrics.Unit/2);
-			AddCylinder(botMid, ModBrickMetrics.KnobRadius, ModBrickMetrics.KnobHeight);
+			AddBottomlessCylinder(botMid, ModBrickMetrics.KnobRadius, ModBrickMetrics.KnobHeight);
 		}
 
 		// c is the center of the BOTTOM circle
-		private void AddCylinder(Vector3 c, float r, float h, bool inverted = false)
+		private void AddBottomlessCylinder(Vector3 c, float r, float h)
 		{
 			for(int i = 0; i < _cylinderSegments; i++)
 			{
