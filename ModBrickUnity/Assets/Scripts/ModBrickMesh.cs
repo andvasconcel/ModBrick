@@ -12,7 +12,7 @@ namespace ModBrick
 
 		void Start()
 		{
-			Init(1,1,3);
+			Init(2,2,3);
 		}
 
         // for standard full height, input 3
@@ -26,21 +26,23 @@ namespace ModBrick
 			float w = width * ModBrickMetrics.Unit;
 			float l = length * ModBrickMetrics.Unit;
 			
-			var tnw = new Vector3(-l/2f, h, -w/2f);
-			var tne = new Vector3(l/2f, h, -w/2f);
-			var tsw = new Vector3(-l/2f, h, w/2f);
-			var tse = new Vector3(l/2f, h, w/2f);
+			var tnw = new Vector3(0, h, 0);
+			var tne = new Vector3(l, h, 0);
+			var tsw = new Vector3(0, h, w);
+			var tse = new Vector3(l, h, w);
 
-			var bnw = new Vector3(-l/2f, 0, -w/2f);
-			var bne = new Vector3(l/2f, 0, -w/2f);
-			var bsw = new Vector3(-l/2f, 0, w/2f);
-			var bse = new Vector3(l/2f, 0, w/2f);
+			var bnw = new Vector3(0, 0, 0);
+			var bne = new Vector3(l, 0, 0);
+			var bsw = new Vector3(0, 0, w);
+			var bse = new Vector3(l, 0, w);
 			
 			
 			AddBottomlessBox(tnw, tne, tsw, tse,
 				   bnw, bne, bsw, bse);
 			InnerBox(tnw, tne, tsw, tse,
 					bnw, bne, bsw, bse);
+			AddKnobs(length, width, h);
+
 
 			
 			_mesh.vertices = _vertices.ToArray();
@@ -49,6 +51,47 @@ namespace ModBrick
 			_filter.mesh = _mesh;
 			
         }
+
+		private void AddKnobs(int length, int width, float height)
+		{
+			for( int x = 0; x < length; x++)
+			{
+				for( int z = 0; z < width; z++)
+				{
+					AddKnob(x, height, z);
+				}
+			}
+		}
+
+		private void AddKnob(int x, float height, int z)
+		{
+			var botMid = new Vector3(x*ModBrickMetrics.Unit + ModBrickMetrics.Unit/2, height, z*ModBrickMetrics.Unit + ModBrickMetrics.Unit/2);
+			var segments = 24;
+			for(int i = 0; i < segments; i++)
+			{
+				var r = ModBrickMetrics.KnobRadius;
+				float rads = (i/(float)segments)*Mathf.PI*2;
+
+				var nextI = Mathf.Repeat(i+1, segments);
+				float nextRads = (nextI/(float)segments)*Mathf.PI*2;
+
+				var botCurrent = new Vector3(
+								botMid.x + r * Mathf.Cos(rads),
+								botMid.y,
+								botMid.z + r * Mathf.Sin(rads));
+				var botNext = new Vector3(
+								botMid.x + r * Mathf.Cos(nextRads),
+								botMid.y,
+								botMid.z + r * Mathf.Sin(nextRads));
+				var topCurrent = new Vector3(botCurrent.x, botCurrent.y + ModBrickMetrics.KnobHeight, botCurrent.z);
+				var topNext = new Vector3(botNext.x, botNext.y + ModBrickMetrics.KnobHeight, botNext.z);
+
+				var topMid = new Vector3(botMid.x, height + ModBrickMetrics.KnobHeight, botMid.z);
+
+				AddQuad(botNext, topNext, topCurrent, botCurrent); // side
+				AddTriangle(topMid, topCurrent, topNext);
+			}
+		}
 
 		private void InnerBox(Vector3 tnw, Vector3 tne, Vector3 tsw, Vector3 tse,
 						   Vector3 bnw, Vector3 bne, Vector3 bsw, Vector3 bse)
@@ -122,5 +165,17 @@ namespace ModBrick
             _triangles.Add(vertexIndex + 1);
             _triangles.Add(vertexIndex);
         }
+
+		private void AddTriangle(Vector3 v1, Vector3 v2, Vector3 v3)
+		{
+			int vertexIndex = _vertices.Count;
+			_vertices.Add(v1);
+			_vertices.Add(v2);
+			_vertices.Add(v3);
+
+			_triangles.Add(vertexIndex);
+			_triangles.Add(vertexIndex+2);
+			_triangles.Add(vertexIndex+1);
+		}
     }
 }
