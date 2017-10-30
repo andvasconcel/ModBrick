@@ -10,6 +10,8 @@ namespace ModBrick
 		private Mesh _mesh;
 		[SerializeField] private MeshFilter _filter;
 
+		private const int _cylinderSegments = 24;
+
 		void Start()
 		{
 			Init(2,2,3);
@@ -66,30 +68,34 @@ namespace ModBrick
 		private void AddKnob(int x, float height, int z)
 		{
 			var botMid = new Vector3(x*ModBrickMetrics.Unit + ModBrickMetrics.Unit/2, height, z*ModBrickMetrics.Unit + ModBrickMetrics.Unit/2);
-			var segments = 24;
-			for(int i = 0; i < segments; i++)
-			{
-				var r = ModBrickMetrics.KnobRadius;
-				float rads = (i/(float)segments)*Mathf.PI*2;
+			AddCylinder(botMid, ModBrickMetrics.KnobRadius, ModBrickMetrics.KnobHeight);
+		}
 
-				var nextI = Mathf.Repeat(i+1, segments);
-				float nextRads = (nextI/(float)segments)*Mathf.PI*2;
+		// c is the center of the BOTTOM circle
+		private void AddCylinder(Vector3 c, float r, float h, bool inverted = false)
+		{
+			for(int i = 0; i < _cylinderSegments; i++)
+			{
+				float rads = (i/(float)_cylinderSegments)*Mathf.PI*2;
+
+				var nextI = Mathf.Repeat(i+1, _cylinderSegments);
+				float nextRads = (nextI/(float)_cylinderSegments)*Mathf.PI*2;
 
 				var botCurrent = new Vector3(
-								botMid.x + r * Mathf.Cos(rads),
-								botMid.y,
-								botMid.z + r * Mathf.Sin(rads));
+								c.x + r * Mathf.Cos(rads),
+								c.y,
+								c.z + r * Mathf.Sin(rads));
 				var botNext = new Vector3(
-								botMid.x + r * Mathf.Cos(nextRads),
-								botMid.y,
-								botMid.z + r * Mathf.Sin(nextRads));
-				var topCurrent = new Vector3(botCurrent.x, botCurrent.y + ModBrickMetrics.KnobHeight, botCurrent.z);
-				var topNext = new Vector3(botNext.x, botNext.y + ModBrickMetrics.KnobHeight, botNext.z);
+								c.x + r * Mathf.Cos(nextRads),
+								c.y,
+								c.z + r * Mathf.Sin(nextRads));
+				var topCurrent = new Vector3(botCurrent.x, botCurrent.y + h, botCurrent.z);
+				var topNext = new Vector3(botNext.x, botNext.y + h, botNext.z);
 
-				var topMid = new Vector3(botMid.x, height + ModBrickMetrics.KnobHeight, botMid.z);
+				var topC = new Vector3(c.x, c.y + h, c.z);
 
 				AddQuad(botNext, topNext, topCurrent, botCurrent); // side
-				AddTriangle(topMid, topCurrent, topNext);
+				AddTriangle(topC, topCurrent, topNext);
 			}
 		}
 
