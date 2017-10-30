@@ -26,27 +26,61 @@ namespace ModBrick
 			float w = width * ModBrickMetrics.Unit;
 			float l = length * ModBrickMetrics.Unit;
 			
-			var topNorthWest = new Vector3(-l/2f, h, -w/2f);
-			var topNorthEast = new Vector3(l/2f, h, -w/2f);
-			var topSouthWest = new Vector3(-l/2f, h, w/2f);
-			var topSouthEast = new Vector3(l/2f, h, w/2f);
+			var tnw = new Vector3(-l/2f, h, -w/2f);
+			var tne = new Vector3(l/2f, h, -w/2f);
+			var tsw = new Vector3(-l/2f, h, w/2f);
+			var tse = new Vector3(l/2f, h, w/2f);
 
-			var botNorthWest = new Vector3(-l/2f, 0, -w/2f);
-			var botNorthEast = new Vector3(l/2f, 0, -w/2f);
-			var botSouthWest = new Vector3(-l/2f, 0, w/2f);
-			var botSouthEast = new Vector3(l/2f, 0, w/2f);
+			var bnw = new Vector3(-l/2f, 0, -w/2f);
+			var bne = new Vector3(l/2f, 0, -w/2f);
+			var bsw = new Vector3(-l/2f, 0, w/2f);
+			var bse = new Vector3(l/2f, 0, w/2f);
 			
-			AddBoxWithoutBottom(topNorthWest, topNorthEast, topSouthWest, topSouthEast,
-				   botNorthWest, botNorthEast, botSouthWest, botSouthEast);
+			
+			AddBottomlessBox(tnw, tne, tsw, tse,
+				   bnw, bne, bsw, bse);
+			InnerBox(tnw, tne, tsw, tse,
+					bnw, bne, bsw, bse);
+
 			
 			_mesh.vertices = _vertices.ToArray();
 			_mesh.triangles = _triangles.ToArray();
+			_mesh.RecalculateNormals();
 			_filter.mesh = _mesh;
+			
         }
 
-		// tnw means top north west, bse means bottom south east...
-		private void AddBoxWithoutBottom(Vector3 tnw, Vector3 tne, Vector3 tsw, Vector3 tse,
+		private void InnerBox(Vector3 tnw, Vector3 tne, Vector3 tsw, Vector3 tse,
 						   Vector3 bnw, Vector3 bne, Vector3 bsw, Vector3 bse)
+		{
+			var tnwi = new Vector3(tnw.x + ModBrickMetrics.Margin, tnw.y - ModBrickMetrics.Margin, tnw.z + ModBrickMetrics.Margin);
+			var tnei = new Vector3(tne.x - ModBrickMetrics.Margin, tne.y - ModBrickMetrics.Margin, tne.z + ModBrickMetrics.Margin);
+			var tswi = new Vector3(tsw.x + ModBrickMetrics.Margin, tsw.y - ModBrickMetrics.Margin, tsw.z - ModBrickMetrics.Margin);
+			var tsei = new Vector3(tse.x - ModBrickMetrics.Margin, tse.y - ModBrickMetrics.Margin, tse.z - ModBrickMetrics.Margin);
+
+			var bnwi = new Vector3(bnw.x + ModBrickMetrics.Margin, bnw.y, bnw.z + ModBrickMetrics.Margin);
+			var bnei = new Vector3(bne.x - ModBrickMetrics.Margin, bne.y, bne.z + ModBrickMetrics.Margin);
+			var bswi = new Vector3(bsw.x + ModBrickMetrics.Margin, bsw.y, bsw.z - ModBrickMetrics.Margin);
+			var bsei = new Vector3(bse.x - ModBrickMetrics.Margin, bse.y, bse.z - ModBrickMetrics.Margin);
+
+			AddBottomlessBox(tnwi, tnei, tswi, tsei, bnwi, bnei, bswi, bsei, true);
+			AddBottomMargin(bnw, bne, bsw, bse, bnwi, bnei, bswi, bsei);
+		}
+
+		// bnwo : bot north west outer, bsei : bot south east inner
+		private void AddBottomMargin(Vector3 bnwo, Vector3 bneo, Vector3 bswo, Vector3 bseo,
+						   Vector3 bnwi, Vector3 bnei, Vector3 bswi, Vector3 bsei)
+		{
+			AddQuad(bswo, bswi, bnwi, bnwo);
+			AddQuad(bnwo, bnwi, bnei, bneo);
+			AddQuad(bneo, bnei, bsei, bseo);
+			AddQuad(bseo, bsei, bswi, bswo);
+		}
+
+		// tnw : top north west, bse : bottom south east
+		private void AddBottomlessBox(Vector3 tnw, Vector3 tne, Vector3 tsw, Vector3 tse,
+						   Vector3 bnw, Vector3 bne, Vector3 bsw, Vector3 bse,
+						   bool inverted = false)
 		{
 			//left  : tnw, tsw, bsw, bnw
 			//front : tne, tnw, bnw, bne
@@ -54,12 +88,22 @@ namespace ModBrick
 			//back  : tsw, tse, bse, bsw
 			//top   : tnw, tne, tse, tsw
 			//bot   : bne, bnw, bsw, bse
-
-			AddQuad(tnw, tsw, bsw, bnw);
-			AddQuad(tne, tnw, bnw, bne);
-			AddQuad(tse, tne, bne, bse);
-			AddQuad(tsw, tse, bse, bsw);
-			AddQuad(tnw, tne, tse, tsw);
+			if(!inverted)
+			{
+				AddQuad(tnw, tsw, bsw, bnw);
+				AddQuad(tne, tnw, bnw, bne);
+				AddQuad(tse, tne, bne, bse);
+				AddQuad(tsw, tse, bse, bsw);
+				AddQuad(tnw, tne, tse, tsw);
+			}
+			else
+			{
+				AddQuad(bnw, bsw, tsw, tnw);
+				AddQuad(bne, bnw, tnw, tne);
+				AddQuad(bse, bne, tne, tse);
+				AddQuad(bsw, bse, tse, tsw);
+				AddQuad(tsw, tse, tne, tnw);
+			}
 
 		}
 
