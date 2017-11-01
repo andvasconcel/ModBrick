@@ -14,9 +14,9 @@ namespace ModBrick
         [SerializeField] private int _width = 1;
         [SerializeField] private int _height = 1;
 
-        private int Length = -1;
-        private int Width = -1;
-        private int Height = -1;
+        [HideInInspector] public int Length = -1;
+        [HideInInspector] public int Width = -1;
+        [HideInInspector] public int Height = -1;
 
 
         private const int _cylinderSegments = 24;
@@ -43,6 +43,11 @@ namespace ModBrick
             {
                 CalculateMesh(Length, Width, Height);
             }
+        }
+
+        public Mesh GetMesh()
+        {
+            return _mesh;
         }
 
         // for standard full height, input 3
