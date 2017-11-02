@@ -47,7 +47,7 @@ namespace ModBrick
 
         public Mesh GetMesh()
         {
-            return _mesh;
+            return _filter.mesh;
         }
 
         // for standard full height, input 3

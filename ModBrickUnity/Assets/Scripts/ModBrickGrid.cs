@@ -69,6 +69,10 @@ namespace ModBrick
 
 		public int GetLowestFree(int x, int z)
 		{
+			if(OutOfBounds(x, 0, z))
+			{
+				return -1; // out of grid
+			}
 			for(int y = 0; y < _y; y++)
 			{
 				if(_grid[x,y,z] == false)
@@ -81,7 +85,7 @@ namespace ModBrick
 
 		private bool OutOfBounds(int x, int y, int z)
 		{
-			if(x > _x || y > _y || z > _z || x < 0 || y < 0 || z < 0)
+			if(x >= _x || y >= _y || z >= _z || x < 0 || y < 0 || z < 0)
 			{
 				return true;
 			}
