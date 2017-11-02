@@ -17,7 +17,7 @@ namespace ModBrick
 
         private List<Vector3> _bottomSnapCells;
         private List<Vector3> _snapCellsSnapped;
-
+        
         void Update()
         {
             if (_grid == null)
@@ -128,9 +128,9 @@ namespace ModBrick
             }
         }
 
-        void Snap()
+        public void Snap()
         {
-
+            transform.position = _visual.transform.position;
         }
     }
 }
