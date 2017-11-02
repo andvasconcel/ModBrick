@@ -5,9 +5,11 @@ namespace ModBrick
 {
     public class ModBrickGrid : MonoBehaviour
     {
-		private int _x = 32;
-		private int _y = 96;
-		private int _z = 32;
+		[SerializeField] private bool _drawGridDebug;
+
+		[SerializeField] private int _x = 32;
+		[SerializeField] private int _y = 96;
+		[SerializeField] private int _z = 32;
 
 		private float _xSize = ModBrickMetrics.Unit;
 		private float _ySize = ModBrickMetrics.ThirdHeight;
@@ -36,6 +38,14 @@ namespace ModBrick
 			var localPos = new Vector3(x,y,z);
 			return transform.TransformPoint(localPos);
 		}
+
+		public void TakeSpace(List<Vector3> gridCellPoints)
+		{
+			foreach(var c in gridCellPoints)
+			{
+				TakeSpace((int)c.x, (int)c.y, (int)c.z);
+			}
+		}
 		
 		public void TakeSpace(int x, int y, int z)
 		{
@@ -44,7 +54,9 @@ namespace ModBrick
 				Debug.LogError("Attempted to take space that was out of bounds");
 				return;
 			}
+			//Debug.Log(x + " - " + y + " - " + z);
 			_grid[x,y,z] = true;
+			Debug.Log(IsTaken(x,y,z));
 		}
 
 		public void FreeSpace(int x, int y, int z)
@@ -65,6 +77,19 @@ namespace ModBrick
 				return true;
 			}
 			return _grid[x,y,z];
+		}
+
+		public bool CanSnap(List<Vector3> gridCellPoints)
+		{
+			foreach(var c in gridCellPoints)
+			{
+				Debug.Log((int)c.x + " - " + (int)c.y + " - " + (int)c.z);
+				if(IsTaken((int)c.x, (int)c.y, (int)c.z))
+				{
+					return false;
+				}
+			}
+			return true;
 		}
 
 		public int GetLowestFree(int x, int z)
@@ -90,6 +115,39 @@ namespace ModBrick
 				return true;
 			}
 			return false;
+		}
+		//private Color _free = new Color(0, 1, 0, 0.1f);
+		//private Color _taken = new Color(1, 0, 0, 0.1f);
+
+		void OnDrawGizmos()
+        {
+			if(_drawGridDebug)
+			{
+				var size = new Vector3(ModBrickMetrics.Unit, ModBrickMetrics.ThirdHeight, ModBrickMetrics.Unit);
+				for(int x = 0; x < _x; x++)
+				{
+					for(int y = 0; y < _y; y++)
+					{
+						for(int z = 0; z < _z; z++)
+						{
+							var worldPos = transform.TransformPoint(new Vector3(
+								x * size.x + size.x/2,
+								y * size.y + size.y/2,
+								z * size.z + size.z/2));
+							var taken = IsTaken(x,y,z);
+							if(!taken)
+							{
+								DrawCube(worldPos, size/*, taken ? _taken : _free*/);
+							}
+						}
+					}
+				}
+			}
+        }
+
+		void DrawCube(Vector3 center, Vector3 size/*, Color color*/)
+		{
+			Gizmos.DrawWireCube(center, size);
 		}
     }
 }

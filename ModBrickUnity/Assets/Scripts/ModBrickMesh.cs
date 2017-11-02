@@ -1,13 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UniRx;
+
 namespace ModBrick
 {
     public class ModBrickMesh : MonoBehaviour
     {
         private List<int> _triangles;
         private List<Vector3> _vertices;
-        private Mesh _mesh;
+        public ReactiveProperty<Mesh> CurrentMesh = new ReactiveProperty<Mesh>();
         [SerializeField] private MeshFilter _filter;
 
         [SerializeField] private int _length = 1;
@@ -47,7 +49,11 @@ namespace ModBrick
 
         public Mesh GetMesh()
         {
-            return _filter.mesh;
+            if(CurrentMesh.Value == null)
+            {
+                return _filter.mesh; // only happens if you initialize the scene with a brick
+            }
+            return CurrentMesh.Value;
         }
 
         // for standard full height, input 3
@@ -55,7 +61,7 @@ namespace ModBrick
         {
             _triangles = new List<int>();
             _vertices = new List<Vector3>();
-            _mesh = new Mesh();
+            var mesh = new Mesh();
 
             float h = height * ModBrickMetrics.ThirdHeight;
             float w = width * ModBrickMetrics.Unit;
@@ -83,10 +89,11 @@ namespace ModBrick
                 AddTubes(length, width);
             }
 
-            _mesh.vertices = _vertices.ToArray();
-            _mesh.triangles = _triangles.ToArray();
-            _mesh.RecalculateNormals();
-            _filter.mesh = _mesh;
+            mesh.vertices = _vertices.ToArray();
+            mesh.triangles = _triangles.ToArray();
+            mesh.RecalculateNormals();
+            CurrentMesh.Value = mesh;
+            _filter.mesh = mesh;
 
         }
 
