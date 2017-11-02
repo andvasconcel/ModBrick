@@ -153,7 +153,7 @@ namespace ModBrick
         {
             if(_grid.CanSnap(_snapCellsSnappedGrid))
             {
-                _grid.TakeSpace(_snapCellsSnappedGrid);
+                _grid.TakeSpace(_snapCellsSnappedGrid, _height);
                 _visual.Hide();
                 transform.position = _visual.transform.position;
             }
