@@ -12,8 +12,8 @@ namespace ModBrick
 		public const float Margin = Unit/5f;
 
 		// note to self: rods are placed in the middle of every unit
-		public const float KnobHeight = FullHeight/6f;
-		public const float KnobRadius = FullHeight/4f;
+		public const float StudHeight = FullHeight/6f;
+		public const float StudRadius = FullHeight/4f;
 
 		// hardcoded
 		public const float TubeRadiusInner = 2.5f;

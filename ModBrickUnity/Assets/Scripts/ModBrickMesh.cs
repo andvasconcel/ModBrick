@@ -82,7 +82,7 @@ namespace ModBrick
                    bnw, bne, bsw, bse);
             InnerBox(tnw, tne, tsw, tse,
                     bnw, bne, bsw, bse);
-            AddKnobs(length, width, h);
+            AddStuds(length, width, h);
             
             if (height >= 3)
             {
@@ -97,13 +97,13 @@ namespace ModBrick
 
         }
 
-        private void AddKnobs(int length, int width, float height)
+        private void AddStuds(int length, int width, float height)
         {
             for (int x = 0; x < length; x++)
             {
                 for (int z = 0; z < width; z++)
                 {
-                    AddKnob(x, height, z);
+                    AddStud(x, height, z);
                 }
             }
         }
@@ -171,10 +171,10 @@ namespace ModBrick
 
         }
 
-        private void AddKnob(int x, float height, int z)
+        private void AddStud(int x, float height, int z)
         {
             var botMid = new Vector3(x * ModBrickMetrics.Unit + ModBrickMetrics.Unit / 2, height, z * ModBrickMetrics.Unit + ModBrickMetrics.Unit / 2);
-            AddBottomlessCylinder(botMid, ModBrickMetrics.KnobRadius, ModBrickMetrics.KnobHeight);
+            AddBottomlessCylinder(botMid, ModBrickMetrics.StudRadius, ModBrickMetrics.StudHeight);
         }
 
         // c is the center of the BOTTOM circle
