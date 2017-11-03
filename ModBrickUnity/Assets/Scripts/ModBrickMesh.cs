@@ -12,6 +12,7 @@ namespace ModBrick
         private List<Vector3> _vertices;
         public ReactiveProperty<Mesh> CurrentMesh = new ReactiveProperty<Mesh>();
         [SerializeField] private MeshFilter _filter;
+        [SerializeField] private MeshCollider _collider;
         private ModBrickInstance _parent;
 
         private int _length = -1;
@@ -75,6 +76,7 @@ namespace ModBrick
             mesh.triangles = _triangles.ToArray();
             mesh.RecalculateNormals();
             CurrentMesh.Value = mesh;
+            _collider.sharedMesh = mesh;
             _filter.mesh = mesh;
 
         }
