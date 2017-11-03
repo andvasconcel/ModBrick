@@ -111,12 +111,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _brickMesh: {fileID: 114973113966023228}
   _brickSnap: {fileID: 114620853530291990}
-  _length: 4
+  _length: 2
   _height: 3
-  _width: 2
-  Length: 4
+  _width: 1
+  Length: 2
   Height: 3
-  Width: 2
+  Width: 1
 --- !u!114 &114620853530291990
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -130,6 +130,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _visualPrefab: {fileID: 114482675470677866, guid: 2fc7c64b80a324afe9b86fd3c3c1d55d,
     type: 2}
+  _debugSnapCell: {fileID: 1168816562725310, guid: db3dbf015aa34431d805e5776e066202,
+    type: 2}
+  _showSnapCells: 0
 --- !u!114 &114973113966023228
 MonoBehaviour:
   m_ObjectHideFlags: 1

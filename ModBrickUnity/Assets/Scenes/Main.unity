@@ -351,6 +351,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _filter: {fileID: 1553705018}
+  _collider: {fileID: 1553705022}
 --- !u!33 &1553705018
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -421,9 +422,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _drawGridDebug: 0
-  _x: 16
-  _y: 1
-  _z: 16
+  _gridX: 16
+  _gridY: 1
+  _gridZ: 16
 --- !u!64 &1553705022
 MeshCollider:
   m_ObjectHideFlags: 0

@@ -5,26 +5,36 @@ using UniRx;
 using System;
 using ModBrick.Utility;
 using System.Linq;
+using TMPro;
 
 namespace ModBrick
 {
+    // this class is the reverse 'stud' part, it looks for a grid to hook on to
     public class ModBrickSnapping : MonoBehaviour
     {
         [SerializeField] private ModBrickSnapVisual _visualPrefab;
+        [Header("Debugging")]
+        [SerializeField] private GameObject _debugSnapCell;
+        [SerializeField] private bool _showSnapCells;
+        private List<GameObject> _snapCellVisuals;
+
         private bool _snapped = false;
         private ModBrickInstance _parent;
         private ModBrickSnapVisual _visual;
-        private ModBrickGrid _grid;
+        private ModBrickGrid _currentGrid;
 
 
         private int _length;
         private int _width;
         private int _height;
 
+
         private List<Vector3> _allSnapCellsLocal;
         private List<Vector3> _bottomSnapCells;
-        private List<Vector3> _snapCellsSnappedWorld;
-        private List<Vector3I> _snapCellsSnappedGrid;
+        private List<ModBrickCell> _potentialGridCellsWorld;
+        private ModBrickCell _potentialBestSnapCell;
+        private List<Vector3I> _potentialGridCells;
+
 
         public void Init(ModBrickInstance parent)
         {
@@ -50,14 +60,10 @@ namespace ModBrick
 
         void Update()
         {
-            if (_grid == null)
-            {
-                _grid = FindObjectOfType<ModBrickGrid>();
-            }
             if (_snapped == false)
             {
                 Vector3 newPosition;
-                var updatedPosition = ClosestSnapPosition(out newPosition);
+                var updatedPosition = SnapUpdate(out newPosition);
                 if (updatedPosition)
                 {
                     _visual.UpdatePosition(newPosition);
@@ -70,6 +76,7 @@ namespace ModBrick
                     Destroy(_visual);
                 }
             }
+            HandleSnapCellVisuals(); 
         }
 
         private void SetSize()
@@ -79,46 +86,57 @@ namespace ModBrick
             _width = _parent.BrickSize.Value.z;
         }
 
-        private bool ClosestSnapPosition(out Vector3 position)
+        private bool SnapUpdate(out Vector3 position)
         {
             // snap cells positions are according to brick local position
             // convert them to grid local space
-            _snapCellsSnappedWorld = new List<Vector3>();
-            _snapCellsSnappedGrid = new List<Vector3I>();
+            _potentialGridCellsWorld = new List<ModBrickCell>();
+            _potentialGridCells = new List<Vector3I>();
             foreach (var v in _bottomSnapCells)
             {
-                var localSnapWorldPos = transform.position + v;
+                var localSnapWorldPos = transform.TransformPoint(v);
                 RaycastHit hit;
                 if (Physics.Raycast(localSnapWorldPos, Vector3.down, out hit))
                 {
                     var grid = hit.collider.gameObject.GetComponent<ModBrickGrid>();
-                    //Debug.Log(hit.collider.gameObject);
                     if (grid != null)
                     {
                         var hitPos = hit.point;
-                        //ar gridLocalPos = _grid.transform.InverseTransformPoint(localSnapWorldPos);
-                        var gridCellPos = _grid.ClosestGridCell(hitPos);
-                        var taken = _grid.IsTaken(gridCellPos);
+                        var gridCellPos = grid.ClosestGridCell(hitPos);
+                        var taken = grid.IsTaken(gridCellPos);
                         if (!taken)
                         {
-                            _snapCellsSnappedGrid.Add(gridCellPos);
-                            var gridCellWorldPos = _grid.GridCellToWorldPos(gridCellPos);
-                            _snapCellsSnappedWorld.Add(gridCellWorldPos);
+                            _potentialGridCells.Add(gridCellPos);
+                            var gridCellWorldPos = grid.GridCellToWorldPos(gridCellPos);
+                            var cell = new ModBrickCell((gridCellWorldPos - transform.position).magnitude, grid, gridCellWorldPos, gridCellPos);
+                            _potentialGridCellsWorld.Add(cell);
                         }
                     }
                 }
             }
-            if (_snapCellsSnappedWorld != null && _snapCellsSnappedWorld.Count != 0)
+            if (_potentialGridCellsWorld != null && _potentialGridCellsWorld.Count != 0)
             {
-                var bestSnap = _snapCellsSnappedWorld.Min(x => (x-transform.position).magnitude); // todo: check up on this
-                position = _snapCellsSnappedWorld.FirstOrDefault(x => (x-transform.position).magnitude == bestSnap);
-                position.x = position.x - ModBrickMetrics.Unit / 2;
-                position.y = position.y - ModBrickMetrics.ThirdHeight / 2;
-                position.z = position.z - ModBrickMetrics.Unit / 2;
+                position = ChooseBestSnappingPosition();
                 return true;
+            }
+            else
+            {
+                // find closest fit
             }
             position = Vector3.zero;
             return false;
+        }
+
+        private Vector3 ChooseBestSnappingPosition()
+        {
+            var bestSnap = _potentialGridCellsWorld.Min(x => x.Distance); // todo: check up on this
+            _potentialBestSnapCell = _potentialGridCellsWorld.FirstOrDefault(x => x.Distance == bestSnap);
+            _currentGrid = _potentialBestSnapCell.CellGrid;
+            Vector3 position = _potentialBestSnapCell.WorldPos;
+            position.x = position.x - ModBrickMetrics.Unit / 2;
+            position.y = position.y - ModBrickMetrics.ThirdHeight / 2;
+            position.z = position.z - ModBrickMetrics.Unit / 2;
+            return position;
         }
 
         private void GenerateCells()
@@ -128,21 +146,73 @@ namespace ModBrick
             {
                 for (int z = 0; z < _width; z++)
                 {
-                    // in the middle of every bottom cell
                     _bottomSnapCells.Add(new Vector3(x * ModBrickMetrics.Unit + ModBrickMetrics.Unit / 2,
-                                            ModBrickMetrics.ThirdHeight / 2,
+                                            0,
                                             z * ModBrickMetrics.Unit + ModBrickMetrics.Unit / 2));
                 }
             }
         }
 
+        private void HandleSnapCellVisuals()
+        {
+            if(_showSnapCells && _snapCellVisuals == null)
+            {
+                _snapCellVisuals = new List<GameObject>();
+                ShowSnapCells();
+            }
+            else if(!_showSnapCells && _snapCellVisuals != null)
+            {
+                HideSnapCells();
+                _snapCellVisuals = null;
+            }
+        }
+
+        private List<Vector3I> GetCellsToTake()
+        {
+            var smallestPosition = _potentialBestSnapCell.GridPos; // smallest x and z
+            List<Vector3I> cellsToTake = new List<Vector3I>();
+            for(int x = smallestPosition.x; x < smallestPosition.x + _length; x++)
+            {
+                for(int z = smallestPosition.z; z < smallestPosition.z + _width; z++)
+                {
+                    cellsToTake.Add(new Vector3I(x, smallestPosition.y, z));
+                }
+            }
+            return cellsToTake;
+        }
+
         public void Snap()
         {
-            if (_grid.CanSnap(_snapCellsSnappedGrid))
+            if (_currentGrid.CanSnap(_potentialGridCells))
             {
-                _grid.TakeSpace(_snapCellsSnappedGrid, _height);
+                var cellsToTake = GetCellsToTake();
+                _currentGrid.TakeSpace(cellsToTake, _height);
                 _visual.Hide();
                 transform.position = _visual.transform.position;
+            }
+        }
+
+
+         // debugging methods
+
+
+        private void ShowSnapCells()
+        {
+            foreach (var v in _bottomSnapCells)
+            {
+                var instance = Instantiate(_debugSnapCell, transform.TransformPoint(v), Quaternion.identity);
+                instance.transform.SetParent(transform);
+                _snapCellVisuals.Add(instance);
+                var tmpro = instance.GetComponentInChildren<TextMeshPro>();
+                tmpro.text = string.Format("X: {0} \n Z: {1}", v.x, v.z);
+            }
+        }
+
+        private void HideSnapCells()
+        {
+            foreach(var c in _snapCellVisuals)
+            {
+                Destroy(c);
             }
         }
     }

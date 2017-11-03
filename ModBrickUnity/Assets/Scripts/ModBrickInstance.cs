@@ -47,6 +47,13 @@ namespace ModBrick
             }
         }
 
+		public void Place()
+		{
+			_brickSnap.Snap();
+			var grid = gameObject.AddComponent<ModBrickGrid>();
+			grid.SetSize(BrickSize.Value); // todo: reactive magic
+		}
+
         void Awake()
         {
             BrickSize.Value = new Vector3I(_length, _height, _width);

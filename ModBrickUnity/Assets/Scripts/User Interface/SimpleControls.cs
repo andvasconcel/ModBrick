@@ -46,7 +46,7 @@ namespace ModBrick.UserInterface
 
         private void PlaceBrick()
         {
-            _currentBrick.BrickSnap.Snap();
+            _currentBrick.Place();
             _currentBrick = null;
         }
 

@@ -5,13 +5,17 @@ using ModBrick.Utility;
 
 namespace ModBrick
 {
+
+    // this class is the 'stud' part of a brick
     public class ModBrickGrid : MonoBehaviour
     {
         [SerializeField] private bool _drawGridDebug;
 
-        [SerializeField] private int _x = 32;
-        [SerializeField] private int _y = 96;
-        [SerializeField] private int _z = 32;
+        [SerializeField] private int _gridX = 32;
+        [SerializeField] private int _gridY = 96;
+        [SerializeField] private int _gridZ = 32;
+
+        private Vector3I _brickSize;
 
         private float _xSize = ModBrickMetrics.Unit;
         private float _ySize = ModBrickMetrics.ThirdHeight;
@@ -19,9 +23,21 @@ namespace ModBrick
 
         private bool[,,] _grid;
 
+        public void SetSize(Vector3I size)
+        {
+            _brickSize = size;
+            _gridX = size.x;
+            _gridY = 1; // todo: should this ever be more than 1?
+            _gridZ = size.z;
+        }
+
         void Start()
         {
-            _grid = new bool[_x, _y, _z];
+            _grid = new bool[_gridX, _gridY, _gridZ];
+            if(_brickSize == null)
+            {
+                _brickSize = new Vector3I(_gridX, _gridY, _gridZ);
+            }
         }
 
         public Vector3I ClosestGridCell(Vector3 localPosition)
@@ -29,16 +45,17 @@ namespace ModBrick
             var x = Mathf.RoundToInt((localPosition.x - _xSize / 2) / _xSize);
             var y = Mathf.RoundToInt((localPosition.y - _ySize / 2) / _ySize);
             var z = Mathf.RoundToInt((localPosition.z - _zSize / 2) / _zSize);
-            x = Mathf.Clamp(x, 0, _x);
-            y = Mathf.Clamp(y, 0, _y);
-            z = Mathf.Clamp(z, 0, _z);
+            x = Mathf.Clamp(x, 0, _gridX);
+            y = Mathf.Clamp(y, 0, _gridY);
+            z = Mathf.Clamp(z, 0, _gridZ);
             return new Vector3I(x, y, z);
         }
 
         public Vector3 GridCellToWorldPos(Vector3I gridCellPos)
         {
             var x = gridCellPos.x * _xSize + _xSize / 2;
-            var y = gridCellPos.y * _ySize + _ySize / 2 + _ySize; // + ySize because bricks snap ABOVE bricks, not INSIDE
+            // because bricks snap ABOVE bricks, not INSIDE, adjust the height
+            var y = gridCellPos.y * _ySize + _ySize / 2 + _ySize * _brickSize.y; 
             var z = gridCellPos.z * _zSize + _zSize / 2;
             var localPos = new Vector3(x, y, z);
             return transform.TransformPoint(localPos);
@@ -71,6 +88,7 @@ namespace ModBrick
                 Debug.LogError("Attempted to take space that was out of bounds");
                 return;
             }
+            Debug.Log("Took space - " + gridCellPos);
             _grid[gridCellPos.x, gridCellPos.y, gridCellPos.z] = true;
         }
 
@@ -109,7 +127,7 @@ namespace ModBrick
 
         private bool OutOfBounds(int x, int y, int z)
         {
-            if (x >= _x || y >= _y || z >= _z || x < 0 || y < 0 || z < 0)
+            if (x >= _gridX || y >= _gridY || z >= _gridZ || x < 0 || y < 0 || z < 0)
             {
                 return true;
             }
@@ -123,11 +141,11 @@ namespace ModBrick
             if (_drawGridDebug)
             {
                 var size = new Vector3(ModBrickMetrics.Unit, ModBrickMetrics.ThirdHeight, ModBrickMetrics.Unit);
-                for (int x = 0; x < _x; x++)
+                for (int x = 0; x < _gridX; x++)
                 {
-                    for (int y = 0; y < _y; y++)
+                    for (int y = 0; y < _gridY; y++)
                     {
-                        for (int z = 0; z < _z; z++)
+                        for (int z = 0; z < _gridZ; z++)
                         {
                             var gridPos = new Vector3I(x,y,z);
                             var worldPos = GridCellToWorldPos(gridPos);
