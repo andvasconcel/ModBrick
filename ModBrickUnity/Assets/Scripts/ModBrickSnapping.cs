@@ -34,14 +34,6 @@ namespace ModBrick
             });
         }
 
-        void Awake()
-        {
-            Observable.Timer(TimeSpan.FromSeconds(3)).Subscribe(_ =>
-            {
-                Snap();
-            });
-        }
-
         void BrickResized()
         {
             if (_visual == null)
