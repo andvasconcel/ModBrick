@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using ModBrick.Utility;
+
 namespace ModBrick
 {
     public class ModBrickGrid : MonoBehaviour
@@ -22,15 +24,15 @@ namespace ModBrick
             _grid = new bool[_x, _y, _z];
         }
 
-        public Vector3 ClosestGridCell(Vector3 localPosition)
+        public Vector3I ClosestGridCell(Vector3 localPosition)
         {
             var x = Mathf.RoundToInt((localPosition.x - _xSize / 2) / _xSize);
             var y = Mathf.RoundToInt((localPosition.y - _ySize / 2) / _ySize);
             var z = Mathf.RoundToInt((localPosition.z - _zSize / 2) / _zSize);
-            return new Vector3(x, y, z);
+            return new Vector3I(x, y, z);
         }
 
-        public Vector3 GridCellToWorldPos(Vector3 gridCellPos)
+        public Vector3 GridCellToWorldPos(Vector3I gridCellPos)
         {
             var x = gridCellPos.x * _xSize + _xSize / 2;
             var y = gridCellPos.y * _ySize + _ySize / 2;
@@ -39,46 +41,44 @@ namespace ModBrick
             return transform.TransformPoint(localPos);
         }
 
-        public void TakeSpace(List<Vector3> gridCellpointsXZ, int heightLevels)
+        public void TakeSpace(List<Vector3I> gridCellpointsXZ, int heightLevels)
         {
             var baseY = (int)gridCellpointsXZ[0].y;
             for (int y = baseY; y < baseY + heightLevels; y++)
             {
                 foreach (var c in gridCellpointsXZ)
                 {
-                    TakeSpace((int)c.x, y, (int)c.z);
+                    TakeSpace(c);
                 }
             }
         }
 
-        public void TakeSpace(List<Vector3> gridCellPoints)
+        public void TakeSpace(List<Vector3I> gridCellPoints)
         {
             foreach (var c in gridCellPoints)
             {
-                TakeSpace((int)c.x, (int)c.y, (int)c.z);
+                TakeSpace(c);
             }
         }
 
-        public void TakeSpace(int x, int y, int z)
+        public void TakeSpace(Vector3I gridCellPos)
         {
-            if (OutOfBounds(x, y, z))
+            if (OutOfBounds(gridCellPos.x, gridCellPos.y, gridCellPos.z))
             {
                 Debug.LogError("Attempted to take space that was out of bounds");
                 return;
             }
-            //Debug.Log(x + " - " + y + " - " + z);
-            _grid[x, y, z] = true;
-            Debug.Log(IsTaken(x, y, z));
+            _grid[gridCellPos.x, gridCellPos.y, gridCellPos.z] = true;
         }
 
-        public void FreeSpace(int x, int y, int z)
+        public void FreeSpace(Vector3I gridCellPos)
         {
-            if (OutOfBounds(x, y, z))
+            if (OutOfBounds(gridCellPos.x, gridCellPos.y, gridCellPos.z))
             {
                 Debug.LogError("Attempted to free space that was out of bounds");
                 return;
             }
-            _grid[x, y, z] = false;
+             _grid[gridCellPos.x, gridCellPos.y, gridCellPos.z] = false;
         }
 
         public bool IsTaken(int x, int y, int z)
@@ -91,12 +91,12 @@ namespace ModBrick
             return _grid[x, y, z];
         }
 
-        public bool CanSnap(List<Vector3> gridCellPoints)
+        public bool CanSnap(List<Vector3I> gridCellPoints)
         {
             foreach (var c in gridCellPoints)
             {
-                Debug.Log((int)c.x + " - " + (int)c.y + " - " + (int)c.z);
-                if (IsTaken((int)c.x, (int)c.y, (int)c.z))
+                //Debug.Log((int)c.x + " - " + (int)c.y + " - " + (int)c.z);
+                if (IsTaken(c.x, c.y, c.z))
                 {
                     return false;
                 }
@@ -104,6 +104,7 @@ namespace ModBrick
             return true;
         }
 
+		// soon obsolete
         public int GetLowestFree(int x, int z)
         {
             if (OutOfBounds(x, 0, z))

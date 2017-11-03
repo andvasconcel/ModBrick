@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
 using System;
+using ModBrick.Utility;
 
 namespace ModBrick
 {
@@ -22,7 +23,7 @@ namespace ModBrick
         private List<Vector3> _allSnapCellsLocal;
         private List<Vector3> _bottomSnapCells;
         private List<Vector3> _snapCellsSnappedWorld;
-        private List<Vector3> _snapCellsSnappedGrid;
+        private List<Vector3I> _snapCellsSnappedGrid;
 
         void Awake()
         {
@@ -103,7 +104,7 @@ namespace ModBrick
             // snap cells positions are according to brick local position
             // convert them to grid local space
             _snapCellsSnappedWorld = new List<Vector3>();
-            _snapCellsSnappedGrid = new List<Vector3>();
+            _snapCellsSnappedGrid = new List<Vector3I>();
             foreach (var v in _bottomSnapCells)
             {
                 var worldPos = transform.position + v;
@@ -117,7 +118,7 @@ namespace ModBrick
                     _snapCellsSnappedWorld = null;
                     break;
                 }
-                var lowestFreeXYZ = new Vector3(gridCellPos.x, lowestFree, gridCellPos.z);
+                var lowestFreeXYZ = new Vector3I(gridCellPos.x, lowestFree, gridCellPos.z);
                 _snapCellsSnappedGrid.Add(lowestFreeXYZ);
                 var gridCellWorldPos = _grid.GridCellToWorldPos(lowestFreeXYZ);
                 _snapCellsSnappedWorld.Add(gridCellWorldPos);
