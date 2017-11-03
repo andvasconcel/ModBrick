@@ -34,7 +34,7 @@ namespace ModBrick
         void Start()
         {
             _grid = new bool[_gridX, _gridY, _gridZ];
-            if(_brickSize == null)
+            if (_brickSize == null)
             {
                 _brickSize = new Vector3I(_gridX, _gridY, _gridZ);
             }
@@ -56,7 +56,7 @@ namespace ModBrick
         {
             var x = gridCellPos.x * _xSize + _xSize / 2;
             // because bricks snap ABOVE bricks, not INSIDE, adjust the height
-            var y = gridCellPos.y * _ySize + _ySize / 2 + _ySize * _brickSize.y; 
+            var y = gridCellPos.y * _ySize + _ySize / 2 + _ySize * _brickSize.y;
             var z = gridCellPos.z * _zSize + _zSize / 2;
             var localPos = new Vector3(x, y, z);
             return transform.TransformPoint(localPos);
@@ -69,7 +69,10 @@ namespace ModBrick
             {
                 foreach (var c in gridCellpointsXZ)
                 {
-                    TakeSpace(c);
+                    if (!OutOfBounds(c))
+                    {
+                        TakeSpace(c);
+                    }
                 }
             }
         }
@@ -84,7 +87,7 @@ namespace ModBrick
 
         public void TakeSpace(Vector3I gridCellPos)
         {
-            if (OutOfBounds(gridCellPos.x, gridCellPos.y, gridCellPos.z))
+            if (OutOfBounds(gridCellPos))
             {
                 Debug.LogError("Attempted to take space that was out of bounds");
                 return;
@@ -94,17 +97,17 @@ namespace ModBrick
 
         public void FreeSpace(Vector3I gridCellPos)
         {
-            if (OutOfBounds(gridCellPos.x, gridCellPos.y, gridCellPos.z))
+            if (OutOfBounds(gridCellPos))
             {
                 Debug.LogError("Attempted to free space that was out of bounds");
                 return;
             }
-             _grid[gridCellPos.x, gridCellPos.y, gridCellPos.z] = false;
+            _grid[gridCellPos.x, gridCellPos.y, gridCellPos.z] = false;
         }
 
         public bool IsTaken(Vector3I gridCellPoint)
         {
-            if (OutOfBounds(gridCellPoint.x, gridCellPoint.y, gridCellPoint.z))
+            if (OutOfBounds(gridCellPoint))
             {
                 Debug.LogError("Attempted to check if out of bounds space was free - " + gridCellPoint);
                 return true;
@@ -116,25 +119,30 @@ namespace ModBrick
         {
             foreach (var c in gridCellPoints)
             {
-                //Debug.Log((int)c.x + " - " + (int)c.y + " - " + (int)c.z);
-                if (IsTaken(c))
+                if (!OutOfBounds(c)) // if you're trying to snap here and potentially somewhere else, it's not THIS grid's problem
                 {
-                    return false;
+                    if (IsTaken(c))
+                    {
+                        return false;
+                    }
                 }
             }
             return true;
         }
 
-        private bool OutOfBounds(int x, int y, int z)
+        private bool OutOfBounds(Vector3I gridCellPoint)
         {
-            if (x >= _gridX || y >= _gridY || z >= _gridZ || x < 0 || y < 0 || z < 0)
+            if (gridCellPoint.x >= _gridX ||
+                gridCellPoint.y >= _gridY ||
+                gridCellPoint.z >= _gridZ ||
+                gridCellPoint.x < 0 ||
+                gridCellPoint.y < 0 ||
+                gridCellPoint.z < 0)
             {
                 return true;
             }
             return false;
         }
-        //private Color _free = new Color(0, 1, 0, 0.1f);
-        //private Color _taken = new Color(1, 0, 0, 0.1f);
 
         void OnDrawGizmos()
         {
@@ -147,12 +155,12 @@ namespace ModBrick
                     {
                         for (int z = 0; z < _gridZ; z++)
                         {
-                            var gridPos = new Vector3I(x,y,z);
+                            var gridPos = new Vector3I(x, y, z);
                             var worldPos = GridCellToWorldPos(gridPos);
                             var taken = IsTaken(gridPos);
                             if (!taken)
                             {
-                                DrawCube(worldPos, size/*, taken ? _taken : _free*/);
+                                DrawCube(worldPos, size);
                             }
                         }
                     }
@@ -160,7 +168,7 @@ namespace ModBrick
             }
         }
 
-        void DrawCube(Vector3 center, Vector3 size/*, Color color*/)
+        void DrawCube(Vector3 center, Vector3 size)
         {
             Gizmos.DrawCube(center, size);
         }

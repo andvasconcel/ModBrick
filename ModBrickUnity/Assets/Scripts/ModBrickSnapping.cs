@@ -179,14 +179,18 @@ namespace ModBrick
                     cellsToTake.Add(new Vector3I(x, smallestPosition.y, z));
                 }
             }
+            foreach(var v in cellsToTake)
+            {
+                Debug.Log(v);
+            }
             return cellsToTake;
         }
 
         public void Snap()
         {
-            if (_currentGrid.CanSnap(_potentialGridCells))
+            var cellsToTake = GetCellsToTake();
+            if (_currentGrid.CanSnap(cellsToTake))
             {
-                var cellsToTake = GetCellsToTake();
                 _currentGrid.TakeSpace(cellsToTake, _height);
                 _visual.Hide();
                 transform.position = _visual.transform.position;
