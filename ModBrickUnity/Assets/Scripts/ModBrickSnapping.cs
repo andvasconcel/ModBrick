@@ -4,6 +4,7 @@ using UnityEngine;
 using UniRx;
 using System;
 using ModBrick.Utility;
+using System.Linq;
 
 namespace ModBrick
 {
@@ -19,7 +20,7 @@ namespace ModBrick
         private int _length;
         private int _width;
         private int _height;
-        
+
         private List<Vector3> _allSnapCellsLocal;
         private List<Vector3> _bottomSnapCells;
         private List<Vector3> _snapCellsSnappedWorld;
@@ -78,23 +79,6 @@ namespace ModBrick
             _width = _parent.BrickSize.Value.z;
         }
 
-        /*void OnDrawGizmos()
-        {
-            if(_snapCellsSnapped == null)
-            {
-                return;
-            }
-            var size = new Vector3(ModBrickMetrics.Unit, ModBrickMetrics.ThirdHeight, ModBrickMetrics.Unit);
-            foreach(var c in _snapCellsSnapped)
-            {
-                //var worldPos = transform.TransformPoint(c);
-                Gizmos.DrawCube(c, size);
-            }
-        }*/
-
-
-        // from width, height and length, figure out where the brick is closest to in the grid.
-        // from top, go down and find a free spot
         private bool ClosestSnapPosition(out Vector3 position)
         {
             // snap cells positions are according to brick local position
@@ -103,25 +87,31 @@ namespace ModBrick
             _snapCellsSnappedGrid = new List<Vector3I>();
             foreach (var v in _bottomSnapCells)
             {
-                var worldPos = transform.position + v;
-                var gridLocalPos = _grid.transform.InverseTransformPoint(worldPos);
-                var gridCellPos = _grid.ClosestGridCell(gridLocalPos);
-                // from closest cells, go down and check if snappable (brick below) and free
-                var lowestFree = _grid.GetLowestFree((int)gridCellPos.x, (int)gridCellPos.z);
-                if (lowestFree == -1)
+                var localSnapWorldPos = transform.position + v;
+                RaycastHit hit;
+                if (Physics.Raycast(localSnapWorldPos, Vector3.down, out hit))
                 {
-                    // cannot snap here
-                    _snapCellsSnappedWorld = null;
-                    break;
+                    var grid = hit.collider.gameObject.GetComponent<ModBrickGrid>();
+                    //Debug.Log(hit.collider.gameObject);
+                    if (grid != null)
+                    {
+                        var hitPos = hit.point;
+                        //ar gridLocalPos = _grid.transform.InverseTransformPoint(localSnapWorldPos);
+                        var gridCellPos = _grid.ClosestGridCell(hitPos);
+                        var taken = _grid.IsTaken(gridCellPos);
+                        if (!taken)
+                        {
+                            _snapCellsSnappedGrid.Add(gridCellPos);
+                            var gridCellWorldPos = _grid.GridCellToWorldPos(gridCellPos);
+                            _snapCellsSnappedWorld.Add(gridCellWorldPos);
+                        }
+                    }
                 }
-                var lowestFreeXYZ = new Vector3I(gridCellPos.x, lowestFree, gridCellPos.z);
-                _snapCellsSnappedGrid.Add(lowestFreeXYZ);
-                var gridCellWorldPos = _grid.GridCellToWorldPos(lowestFreeXYZ);
-                _snapCellsSnappedWorld.Add(gridCellWorldPos);
             }
-            if (_snapCellsSnappedWorld != null)
+            if (_snapCellsSnappedWorld != null && _snapCellsSnappedWorld.Count != 0)
             {
-                position = _snapCellsSnappedWorld[0];
+                var bestSnap = _snapCellsSnappedWorld.Min(x => (x-transform.position).magnitude); // todo: check up on this
+                position = _snapCellsSnappedWorld.FirstOrDefault(x => (x-transform.position).magnitude == bestSnap);
                 position.x = position.x - ModBrickMetrics.Unit / 2;
                 position.y = position.y - ModBrickMetrics.ThirdHeight / 2;
                 position.z = position.z - ModBrickMetrics.Unit / 2;
@@ -148,7 +138,7 @@ namespace ModBrick
 
         public void Snap()
         {
-            if(_grid.CanSnap(_snapCellsSnappedGrid))
+            if (_grid.CanSnap(_snapCellsSnappedGrid))
             {
                 _grid.TakeSpace(_snapCellsSnappedGrid, _height);
                 _visual.Hide();

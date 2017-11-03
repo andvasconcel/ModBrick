@@ -239,52 +239,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _modBrickPrefab: {fileID: 114038029149485590, guid: 59a86ed94dfeb4a9bb227c2a5f0c51d7,
     type: 2}
-  _speed: 1
---- !u!1 &1211899246
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 1211899250}
-  - component: {fileID: 1211899251}
-  m_Layer: 0
-  m_Name: GridSnap
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1211899250
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1211899246}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 1553705016}
-  m_Father: {fileID: 0}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1211899251
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1211899246}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 112aaeca242ef48da9112dad2c0b09ab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _drawGridDebug: 0
-  _x: 16
-  _y: 1
-  _z: 16
+  _speed: 20
 --- !u!1 &1456018131
 GameObject:
   m_ObjectHideFlags: 0
@@ -362,6 +317,8 @@ GameObject:
   - component: {fileID: 1553705018}
   - component: {fileID: 1553705017}
   - component: {fileID: 1553705020}
+  - component: {fileID: 1553705021}
+  - component: {fileID: 1553705022}
   m_Layer: 0
   m_Name: Floor
   m_TagString: Untagged
@@ -379,8 +336,8 @@ Transform:
   m_LocalPosition: {x: 0, y: -3.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 1211899250}
-  m_RootOrder: 0
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1553705017
 MonoBehaviour:
@@ -452,6 +409,35 @@ MonoBehaviour:
   Length: 16
   Height: 1
   Width: 16
+--- !u!114 &1553705021
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1553705015}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 112aaeca242ef48da9112dad2c0b09ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _drawGridDebug: 0
+  _x: 16
+  _y: 1
+  _z: 16
+--- !u!64 &1553705022
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1553705015}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Convex: 0
+  m_InflateMesh: 0
+  m_SkinWidth: 0.01
+  m_Mesh: {fileID: 1840198486}
 --- !u!43 &1840198486
 Mesh:
   m_ObjectHideFlags: 0

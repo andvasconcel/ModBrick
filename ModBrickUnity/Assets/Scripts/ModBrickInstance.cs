@@ -11,6 +11,7 @@ namespace ModBrick
         [SerializeField] private ModBrickMesh _brickMesh;
         [SerializeField] private ModBrickSnapping _brickSnap;
         public ModBrickMesh BrickMesh => _brickMesh;
+		public ModBrickSnapping BrickSnap => _brickSnap;
 
         [SerializeField] private int _length = 1;
         [SerializeField] private int _height = 1;

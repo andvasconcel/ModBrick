@@ -20,14 +20,14 @@ namespace ModBrick.UserInterface
         {
             if (Input.GetKeyDown(KeyCode.N))
             {
-                _currentBrick = Instantiate(_modBrickPrefab, Vector3.zero, Quaternion.identity);
+                _currentBrick = Instantiate(_modBrickPrefab, new Vector3(0, ModBrickMetrics.FullHeight, 0), Quaternion.identity);
             }
             if (_currentBrick != null)
             {
                 CheckForMovement();
                 if (Input.GetKeyDown(KeyCode.P))
                 {
-
+					PlaceBrick();
                 }
             }
         }
@@ -46,7 +46,7 @@ namespace ModBrick.UserInterface
 
         private void PlaceBrick()
         {
-            // snap
+            _currentBrick.BrickSnap.Snap();
             _currentBrick = null;
         }
 
