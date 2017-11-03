@@ -43,10 +43,11 @@ namespace ModBrick
         public Vector3I ClosestGridCell(Vector3 localPosition)
         {
             var x = Mathf.RoundToInt((localPosition.x - _xSize / 2) / _xSize);
-            var y = Mathf.RoundToInt((localPosition.y - _ySize / 2) / _ySize);
+            var y = 0;
+            //var y = Mathf.RoundToInt((localPosition.y - _ySize / 2) / _ySize);
             var z = Mathf.RoundToInt((localPosition.z - _zSize / 2) / _zSize);
             x = Mathf.Clamp(x, 0, _gridX);
-            y = Mathf.Clamp(y, 0, _gridY);
+            //y = Mathf.Clamp(y, 0, _gridY);
             z = Mathf.Clamp(z, 0, _gridZ);
             return new Vector3I(x, y, z);
         }
@@ -88,7 +89,6 @@ namespace ModBrick
                 Debug.LogError("Attempted to take space that was out of bounds");
                 return;
             }
-            Debug.Log("Took space - " + gridCellPos);
             _grid[gridCellPos.x, gridCellPos.y, gridCellPos.z] = true;
         }
 

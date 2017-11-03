@@ -35,9 +35,12 @@ namespace ModBrick.UserInterface
         private void CheckForMovement()
         {
             var x = Input.GetAxis("Horizontal");
+			var y = Input.GetKey(KeyCode.LeftControl) ? -1 : 0;
+			y = Input.GetKey(KeyCode.Space) ? 1 : y;
             var z = Input.GetAxis("Vertical");
             var pos = _currentBrick.gameObject.transform.position;
             pos.x = pos.x + x * Time.deltaTime * _speed;
+			pos.y = pos.y + y * Time.deltaTime * _speed;
             pos.z = pos.z + z * Time.deltaTime * _speed;
 
             _currentBrick.gameObject.transform.position = pos; 

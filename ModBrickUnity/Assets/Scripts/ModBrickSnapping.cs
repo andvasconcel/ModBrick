@@ -102,7 +102,8 @@ namespace ModBrick
                     if (grid != null)
                     {
                         var hitPos = hit.point;
-                        var gridCellPos = grid.ClosestGridCell(hitPos);
+                        var hitPosGridLocal = grid.transform.InverseTransformPoint(hitPos);
+                        var gridCellPos = grid.ClosestGridCell(hitPosGridLocal);
                         var taken = grid.IsTaken(gridCellPos);
                         if (!taken)
                         {
