@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
+using ModBrick.Utility;
 
 namespace ModBrick
 {
@@ -11,61 +12,42 @@ namespace ModBrick
         private List<Vector3> _vertices;
         public ReactiveProperty<Mesh> CurrentMesh = new ReactiveProperty<Mesh>();
         [SerializeField] private MeshFilter _filter;
+        private ModBrickInstance _parent;
 
-        [SerializeField] private int _length = 1;
-        [SerializeField] private int _width = 1;
-        [SerializeField] private int _height = 1;
-
-        [HideInInspector] public int Length = -1;
-        [HideInInspector] public int Width = -1;
-        [HideInInspector] public int Height = -1;
-
-
+        private int _length = -1;
+        private int _width = -1;
+        private int _height = -1;
         private const int _cylinderSegments = 24;
 
-        void OnValidate()
+        public void Init(ModBrickInstance parent)
         {
-            bool remesh = false;
-            if(Length != _length)
+            _parent = parent;
+            _parent.BrickSize.Subscribe(size => 
             {
-                Length = _length;
-                remesh = true;
-            }
-            if(Width != _width)
-            {
-                Width = _width;
-                remesh = true;
-            }
-            if(Height != _height)
-            {
-                Height = _height;
-                remesh = true;
-            }
-            if(remesh)
-            {
-                CalculateMesh(Length, Width, Height);
-            }
+                CalculateMesh(size);
+            });
         }
+
 
         public Mesh GetMesh()
         {
-            if(CurrentMesh.Value == null)
+            if (CurrentMesh.Value == null)
             {
                 return _filter.mesh; // only happens if you initialize the scene with a brick
             }
             return CurrentMesh.Value;
         }
 
-        // for standard full height, input 3
-        public void CalculateMesh(int length, int width, int height)
+        // for standard full height, input 3 in y
+        public void CalculateMesh(Vector3I size)
         {
             _triangles = new List<int>();
             _vertices = new List<Vector3>();
             var mesh = new Mesh();
 
-            float h = height * ModBrickMetrics.ThirdHeight;
-            float w = width * ModBrickMetrics.Unit;
-            float l = length * ModBrickMetrics.Unit;
+            float l = size.x * ModBrickMetrics.Unit;
+            float h = size.y * ModBrickMetrics.ThirdHeight;
+            float w = size.z * ModBrickMetrics.Unit;
 
             var tnw = new Vector3(0, h, 0);
             var tne = new Vector3(l, h, 0);
@@ -82,11 +64,11 @@ namespace ModBrick
                    bnw, bne, bsw, bse);
             InnerBox(tnw, tne, tsw, tse,
                     bnw, bne, bsw, bse);
-            AddStuds(length, width, h);
-            
-            if (height >= 3)
+            AddStuds(size.x, size.z, h);
+
+            if (size.y >= 3)
             {
-                AddTubes(length, width);
+                AddTubes(size.x, size.z);
             }
 
             mesh.vertices = _vertices.ToArray();
@@ -112,7 +94,7 @@ namespace ModBrick
         {
             int tubesX = length - 1;
             int tubesZ = width - 1;
-            if(tubesX+tubesZ < 2)
+            if (tubesX + tubesZ < 2)
             {
                 return;
             }

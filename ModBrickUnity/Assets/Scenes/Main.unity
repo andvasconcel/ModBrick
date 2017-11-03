@@ -507,7 +507,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _drawGridDebug: 0
   _x: 16
-  _y: 32
+  _y: 1
   _z: 16
 --- !u!43 &1233306338
 Mesh:

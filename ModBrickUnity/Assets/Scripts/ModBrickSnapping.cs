@@ -9,9 +9,9 @@ namespace ModBrick
 {
     public class ModBrickSnapping : MonoBehaviour
     {
-        private bool _snapped = false;
-        [SerializeField] private ModBrickMesh _brickMesh;
         [SerializeField] private ModBrickSnapVisual _visualPrefab;
+        private bool _snapped = false;
+        private ModBrickInstance _parent;
         private ModBrickSnapVisual _visual;
         private ModBrickGrid _grid;
 
@@ -25,27 +25,31 @@ namespace ModBrick
         private List<Vector3> _snapCellsSnappedWorld;
         private List<Vector3I> _snapCellsSnappedGrid;
 
+        public void Init(ModBrickInstance parent)
+        {
+            _parent = parent;
+            _parent.BrickSize.Subscribe(size =>
+            {
+                BrickResized();
+            });
+        }
+
         void Awake()
         {
-            _brickMesh.CurrentMesh.Subscribe(_ =>
-            {
-                MeshUpdated();
-            });
-            MeshUpdated();
             Observable.Timer(TimeSpan.FromSeconds(3)).Subscribe(_ =>
             {
                 Snap();
             });
         }
 
-        void MeshUpdated()
+        void BrickResized()
         {
             if (_visual == null)
             {
                 _visual = Instantiate(_visualPrefab, transform.position, transform.rotation);
                 _visual.transform.SetParent(transform);
             }
-            _visual.SetMesh(_brickMesh.GetMesh());
+            _visual.SetMesh(_parent.BrickMesh.GetMesh());
             _visual.Show();
             SetSize();
             GenerateCells();
@@ -77,9 +81,9 @@ namespace ModBrick
 
         private void SetSize()
         {
-            _length = _brickMesh.Length;
-            _width = _brickMesh.Width;
-            _height = _brickMesh.Height;
+            _length = _parent.BrickSize.Value.x;
+            _height = _parent.BrickSize.Value.y;
+            _width = _parent.BrickSize.Value.z;
         }
 
         /*void OnDrawGizmos()
