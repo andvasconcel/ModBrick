@@ -21,5 +21,10 @@ namespace ModBrick
 		public const float TubeHeight = Unit; // in case you want a different height for tubes and rods 
 
 		public const float RodRadius = 1.6f;
+
+		public static float RoundHalfUnit(float value)
+		{
+			return Mathf.Abs(value) < Unit/2 ? 0 : Unit;
+		}
     }
 }

@@ -24,7 +24,8 @@ namespace ModBrick.UserInterface
             }
             if (_currentBrick != null)
             {
-                CheckForMovement();
+                DoTranslate();
+				DoRotate();
                 if (Input.GetKeyDown(KeyCode.P))
                 {
 					PlaceBrick();
@@ -32,7 +33,7 @@ namespace ModBrick.UserInterface
             }
         }
 
-        private void CheckForMovement()
+        private void DoTranslate()
         {
             var x = Input.GetAxis("Horizontal");
 			var y = Input.GetKey(KeyCode.LeftControl) ? -1 : 0;
@@ -44,8 +45,15 @@ namespace ModBrick.UserInterface
             pos.z = pos.z + z * Time.deltaTime * _speed;
 
             _currentBrick.gameObject.transform.position = pos; 
-
         }
+
+		private void DoRotate()
+		{
+			if(Input.GetKeyDown(KeyCode.R))
+			{
+				_currentBrick.gameObject.transform.Rotate(0, 90, 0);
+			}
+		}
 
         private void PlaceBrick()
         {

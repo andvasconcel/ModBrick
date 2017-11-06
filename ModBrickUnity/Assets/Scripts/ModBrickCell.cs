@@ -11,6 +11,8 @@ namespace ModBrick
 		public ModBrickGrid CellGrid; // grid this cell belongs to
 		public Vector3 WorldPos; // what could this be
 		public Vector3I GridPos; // position of cell in grid
+		public Vector3 TubeWorldPos; 
+		public Vector3 TubeLocalPos;
 
 		public ModBrickCell(float distance, ModBrickGrid grid, Vector3 worldPos, Vector3I gridPos)
 		{

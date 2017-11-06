@@ -16,6 +16,7 @@ namespace ModBrick
         [Header("Debugging")]
         [SerializeField] private GameObject _debugSnapCell;
         [SerializeField] private bool _showSnapCells;
+        [SerializeField] private bool _showPotentialStudTargets;
         private List<GameObject> _snapCellVisuals;
 
         private bool _snapped = false;
@@ -92,9 +93,9 @@ namespace ModBrick
             // convert them to grid local space
             _potentialGridCellsWorld = new List<ModBrickCell>();
             _potentialGridCells = new List<Vector3I>();
-            foreach (var v in _bottomSnapCells)
+            foreach (var localSnapPosition in _bottomSnapCells)
             {
-                var localSnapWorldPos = transform.TransformPoint(v);
+                var localSnapWorldPos = transform.TransformPoint(localSnapPosition);
                 RaycastHit hit;
                 if (Physics.Raycast(localSnapWorldPos, Vector3.down, out hit))
                 {
@@ -110,6 +111,8 @@ namespace ModBrick
                             _potentialGridCells.Add(gridCellPos);
                             var gridCellWorldPos = grid.GridCellToWorldPos(gridCellPos);
                             var cell = new ModBrickCell((gridCellWorldPos - transform.position).magnitude, grid, gridCellWorldPos, gridCellPos);
+                            cell.TubeWorldPos = localSnapWorldPos;
+                            cell.TubeLocalPos = localSnapPosition;
                             _potentialGridCellsWorld.Add(cell);
                         }
                     }
@@ -133,10 +136,20 @@ namespace ModBrick
             var bestSnap = _potentialGridCellsWorld.Min(x => x.Distance); // todo: check up on this
             _potentialBestSnapCell = _potentialGridCellsWorld.FirstOrDefault(x => x.Distance == bestSnap);
             _currentGrid = _potentialBestSnapCell.CellGrid;
+            // get the world position of that snappable stud:
             Vector3 position = _potentialBestSnapCell.WorldPos;
-            position.x = position.x - ModBrickMetrics.Unit / 2;
+            //position.x = position.x - ModBrickMetrics.Unit / 2;
+            //position.y = position.y - ModBrickMetrics.ThirdHeight / 2;
+            //position.z = position.z - ModBrickMetrics.Unit / 2;
+            // alright now this brick might be offset, so if it's not aligned perfectly...
+            // we do that by making sure that the target tube matches up with the stud:
+            
+            position.x = position.x - _potentialBestSnapCell.TubeLocalPos.x;
             position.y = position.y - ModBrickMetrics.ThirdHeight / 2;
-            position.z = position.z - ModBrickMetrics.Unit / 2;
+            position.z = position.z - _potentialBestSnapCell.TubeLocalPos.z;
+
+            //Debug.Log(xDiff + " - " + zDiff);
+            Debug.Log(position);
             return position;
         }
 
@@ -168,6 +181,17 @@ namespace ModBrick
             }
         }
 
+        private void OnDrawGizmos()
+        {
+            if(_showPotentialStudTargets)
+            {
+                foreach(var v in _potentialGridCellsWorld)
+                {
+                    Gizmos.DrawLine(v.WorldPos, v.TubeWorldPos);
+                }
+            }
+        }
+
         private List<Vector3I> GetCellsToTake()
         {
             var smallestPosition = _potentialBestSnapCell.GridPos; // smallest x and z
@@ -178,10 +202,6 @@ namespace ModBrick
                 {
                     cellsToTake.Add(new Vector3I(x, smallestPosition.y, z));
                 }
-            }
-            foreach(var v in cellsToTake)
-            {
-                Debug.Log(v);
             }
             return cellsToTake;
         }
