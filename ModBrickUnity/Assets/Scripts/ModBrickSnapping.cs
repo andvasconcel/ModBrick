@@ -136,20 +136,15 @@ namespace ModBrick
             var bestSnap = _potentialGridCellsWorld.Min(x => x.Distance); // todo: check up on this
             _potentialBestSnapCell = _potentialGridCellsWorld.FirstOrDefault(x => x.Distance == bestSnap);
             _currentGrid = _potentialBestSnapCell.CellGrid;
+            
             // get the world position of that snappable stud:
             Vector3 position = _potentialBestSnapCell.WorldPos;
-            //position.x = position.x - ModBrickMetrics.Unit / 2;
-            //position.y = position.y - ModBrickMetrics.ThirdHeight / 2;
-            //position.z = position.z - ModBrickMetrics.Unit / 2;
-            // alright now this brick might be offset, so if it's not aligned perfectly...
-            // we do that by making sure that the target tube matches up with the stud:
-            
+
+            // make sure entire brick is offset according to tube/stub being snapped to:
             position.x = position.x - _potentialBestSnapCell.TubeLocalPos.x;
             position.y = position.y - ModBrickMetrics.ThirdHeight / 2;
             position.z = position.z - _potentialBestSnapCell.TubeLocalPos.z;
 
-            //Debug.Log(xDiff + " - " + zDiff);
-            Debug.Log(position);
             return position;
         }
 
