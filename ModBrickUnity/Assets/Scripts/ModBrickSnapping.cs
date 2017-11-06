@@ -187,6 +187,7 @@ namespace ModBrick
             }
         }
 
+        // todo: this has to check if it's taking cells on other grids too
         private List<Vector3I> GetCellsToTake()
         {
             var smallestPosition = _potentialBestSnapCell.GridPos; // smallest x and z
@@ -208,7 +209,9 @@ namespace ModBrick
             {
                 _currentGrid.TakeSpace(cellsToTake, _height);
                 _visual.Hide();
+                _visual.transform.SetParent(null);
                 transform.position = _visual.transform.position;
+                transform.position = ModBrickMetrics.RoundToGrid(transform.position);
             }
         }
 

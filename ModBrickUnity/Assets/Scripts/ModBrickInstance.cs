@@ -8,14 +8,19 @@ namespace ModBrick
 {
     public class ModBrickInstance : MonoBehaviour
     {
+        [Header("Submodules")]
         [SerializeField] private ModBrickMesh _brickMesh;
         [SerializeField] private ModBrickSnapping _brickSnap;
+
         public ModBrickMesh BrickMesh => _brickMesh;
 		public ModBrickSnapping BrickSnap => _brickSnap;
 
+        [Header("Settings")]
         [SerializeField] private int _length = 1;
         [SerializeField] private int _height = 1;
         [SerializeField] private int _width = 1;
+
+        [SerializeField] private MeshRenderer _renderer;
 
         [HideInInspector] public int Length = -1;
         [HideInInspector] public int Height = -1;
@@ -54,6 +59,11 @@ namespace ModBrick
 			grid.SetSize(BrickSize.Value); // todo: reactive magic
 		}
 
+        public void SetColor(Color color)
+        {
+            _renderer.material.color = color;
+        }
+
         void Awake()
         {
             BrickSize.Value = new Vector3I(_length, _height, _width);
@@ -65,6 +75,16 @@ namespace ModBrick
             {
                 _brickSnap.Init(this);
             }
+            SetColor(RandomColor());
         }
+
+        Color RandomColor()
+        {
+            var r = Random.Range(0, 1f);
+            var g = Random.Range(0, 1f);
+            var b = Random.Range(0, 1f);
+            return new Color(r,g,b,1);
+        }
+
     }
 }

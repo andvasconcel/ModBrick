@@ -22,9 +22,17 @@ namespace ModBrick
 
 		public const float RodRadius = 1.6f;
 
-		public static float RoundHalfUnit(float value)
+		public static Vector3 RoundToGrid(Vector3 unRounded)
 		{
-			return Mathf.Abs(value) < Unit/2 ? 0 : Unit;
+			var x = RoundToN(unRounded.x, Unit);
+			var y = RoundToN(unRounded.y, ThirdHeight);
+			var z = RoundToN(unRounded.z, Unit);
+			return new Vector3(x,y,z);
+		}
+
+		public static float RoundToN(float value, float N)
+		{
+			return Mathf.Round(value/N)*N;
 		}
     }
 }
