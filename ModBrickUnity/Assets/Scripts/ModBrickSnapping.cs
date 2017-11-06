@@ -176,16 +176,6 @@ namespace ModBrick
             }
         }
 
-        private void OnDrawGizmos()
-        {
-            if(_showPotentialStudTargets)
-            {
-                foreach(var v in _potentialGridCellsWorld)
-                {
-                    Gizmos.DrawLine(v.WorldPos, v.TubeWorldPos);
-                }
-            }
-        }
 
         // todo: this has to check if it's taking cells on other grids too
         private List<Vector3I> GetCellsToTake()
@@ -218,6 +208,16 @@ namespace ModBrick
 
          // debugging methods
 
+        private void OnDrawGizmos()
+        {
+            if(_showPotentialStudTargets)
+            {
+                foreach(var v in _potentialGridCellsWorld)
+                {
+                    Gizmos.DrawLine(v.WorldPos, v.TubeWorldPos);
+                }
+            }
+        }
 
         private void ShowSnapCells()
         {
