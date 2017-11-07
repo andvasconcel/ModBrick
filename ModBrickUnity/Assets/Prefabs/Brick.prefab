@@ -54,6 +54,7 @@ MeshRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -69,6 +70,7 @@ MeshRenderer:
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
   m_SelectedEditorRenderState: 3
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
@@ -111,13 +113,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _brickMesh: {fileID: 114973113966023228}
   _brickSnap: {fileID: 114620853530291990}
-  _length: 2
+  _length: 4
   _height: 3
-  _width: 1
+  _width: 2
   _renderer: {fileID: 23346503414362044}
-  Length: 2
+  Length: 4
   Height: 3
-  Width: 1
+  Width: 2
 --- !u!114 &114620853530291990
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -176,20 +176,11 @@ namespace ModBrick
             }
         }
 
-
-        // todo: this has to check if it's taking cells on other grids too
-        private List<Vector3I> GetCellsToTake()
+        public List<ModBrickCell> GetCellsToTake()
         {
-            var smallestPosition = _potentialBestSnapCell.GridPos; // smallest x and z
-            List<Vector3I> cellsToTake = new List<Vector3I>();
-            for(int x = smallestPosition.x; x < smallestPosition.x + _length; x++)
-            {
-                for(int z = smallestPosition.z; z < smallestPosition.z + _width; z++)
-                {
-                    cellsToTake.Add(new Vector3I(x, smallestPosition.y, z));
-                }
-            }
-            return cellsToTake;
+            var highestPosition = _potentialGridCellsWorld.Max(x => x.WorldPos.y);
+            var highestCells = _potentialGridCellsWorld.Where(x => x.WorldPos.y == highestPosition).ToList();
+            return highestCells;
         }
 
         private List<Vector3I> CellsIntersectingInGrid(ModBrickGrid grid)
@@ -200,18 +191,19 @@ namespace ModBrick
         public void Snap()
         {
             var cellsToTake = GetCellsToTake();
-            if (_currentGrid.CanSnap(cellsToTake))
+            foreach(var c in cellsToTake)
             {
-                _currentGrid.TakeSpace(cellsToTake, _height);
-                _visual.Hide();
-                _visual.transform.SetParent(null);
-                transform.position = _visual.transform.position;
-                transform.position = ModBrickMetrics.RoundToGrid(transform.position);
+                c.CellGrid.TakeSpace(c.GridPos);
+                
             }
+            _visual.Hide();
+            _visual.transform.SetParent(null);
+            transform.position = _visual.transform.position;
+            transform.position = ModBrickMetrics.RoundToGrid(transform.position);
         }
 
 
-         // debugging methods
+        // debugging methods
 
         private void OnDrawGizmos()
         {
