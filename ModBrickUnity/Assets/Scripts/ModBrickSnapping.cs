@@ -74,7 +74,7 @@ namespace ModBrick
             {
                 if (_visual != null)
                 {
-                    Destroy(_visual);
+                    Destroy(_visual.gameObject);
                 }
             }
             HandleSnapCellVisuals(); 
@@ -176,16 +176,11 @@ namespace ModBrick
             }
         }
 
-        public List<ModBrickCell> GetCellsToTake()
+        private List<ModBrickCell> GetCellsToTake()
         {
             var highestPosition = _potentialGridCellsWorld.Max(x => x.WorldPos.y);
             var highestCells = _potentialGridCellsWorld.Where(x => x.WorldPos.y == highestPosition).ToList();
             return highestCells;
-        }
-
-        private List<Vector3I> CellsIntersectingInGrid(ModBrickGrid grid)
-        {
-            return null;
         }
 
         private bool CanSnap(List<ModBrickCell> potentialSnapCells)
@@ -214,6 +209,7 @@ namespace ModBrick
                 _visual.transform.SetParent(null);
                 transform.position = _visual.transform.position;
                 transform.position = ModBrickMetrics.RoundToGrid(transform.position);
+                _snapped = true;
                 return true;
             }
             return false;
