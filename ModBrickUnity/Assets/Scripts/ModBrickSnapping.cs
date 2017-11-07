@@ -192,6 +192,11 @@ namespace ModBrick
             return cellsToTake;
         }
 
+        private List<Vector3I> CellsIntersectingInGrid(ModBrickGrid grid)
+        {
+            return null;
+        }
+
         public void Snap()
         {
             var cellsToTake = GetCellsToTake();

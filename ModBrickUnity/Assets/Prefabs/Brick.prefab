@@ -114,6 +114,7 @@ MonoBehaviour:
   _length: 2
   _height: 3
   _width: 1
+  _renderer: {fileID: 23346503414362044}
   Length: 2
   Height: 3
   Width: 1
@@ -133,6 +134,7 @@ MonoBehaviour:
   _debugSnapCell: {fileID: 1168816562725310, guid: db3dbf015aa34431d805e5776e066202,
     type: 2}
   _showSnapCells: 0
+  _showPotentialStudTargets: 0
 --- !u!114 &114973113966023228
 MonoBehaviour:
   m_ObjectHideFlags: 1
