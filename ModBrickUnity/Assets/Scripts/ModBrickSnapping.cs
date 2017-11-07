@@ -51,7 +51,7 @@ namespace ModBrick
             if (_visual == null)
             {
                 _visual = Instantiate(_visualPrefab, transform.position, transform.rotation);
-                _visual.transform.SetParent(transform);
+                _visual.transform.SetParent(null);
             }
             _visual.SetMesh(_parent.BrickMesh.GetMesh());
             _visual.Show();
@@ -65,7 +65,7 @@ namespace ModBrick
             {
                 Vector3 newPosition;
                 var updatedPosition = SnapUpdate(out newPosition);
-                if (updatedPosition)
+                if (updatedPosition && CanSnap(GetCellsToTake()))
                 {
                     _visual.UpdatePosition(newPosition);
                 }
@@ -183,9 +183,14 @@ namespace ModBrick
             return highestCells;
         }
 
-        private bool CanSnap(List<ModBrickCell> potentialSnapCells)
+        private bool CanSnap(List<ModBrickCell> potentialSnapCellsSameLevel)
         {
-            foreach(var c in potentialSnapCells)
+            // if they stud count is not the same as the inverse-stud count, that means we are colliding with something
+            if(_potentialGridCellsWorld.Count != _bottomSnapCells.Count)
+            {
+                return false;
+            }
+            foreach(var c in potentialSnapCellsSameLevel)
             {
                 if(c.CellGrid.IsTaken(c.GridPos))
                 {
