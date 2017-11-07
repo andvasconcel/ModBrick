@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
 using ModBrick.Utility;
+using ColorPickerUnity;
 
 namespace ModBrick
 {
@@ -75,15 +76,7 @@ namespace ModBrick
             {
                 _brickSnap.Init(this);
             }
-            SetColor(RandomColor());
-        }
-
-        Color RandomColor()
-        {
-            var r = Random.Range(0, 1f);
-            var g = Random.Range(0, 1f);
-            var b = Random.Range(0, 1f);
-            return new Color(r,g,b,1);
+            SetColor(ColorExtensions.RandomHueColor(1,1));
         }
 
     }
