@@ -188,18 +188,35 @@ namespace ModBrick
             return null;
         }
 
-        public void Snap()
+        private bool CanSnap(List<ModBrickCell> potentialSnapCells)
+        {
+            foreach(var c in potentialSnapCells)
+            {
+                if(c.CellGrid.IsTaken(c.GridPos))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // return true if success, false if failure
+        public bool Snap()
         {
             var cellsToTake = GetCellsToTake();
-            foreach(var c in cellsToTake)
+            if(CanSnap(cellsToTake))
             {
-                c.CellGrid.TakeSpace(c.GridPos);
-                
+                foreach(var c in cellsToTake)
+                {
+                    c.CellGrid.TakeSpace(c.GridPos);
+                }
+                _visual.Hide();
+                _visual.transform.SetParent(null);
+                transform.position = _visual.transform.position;
+                transform.position = ModBrickMetrics.RoundToGrid(transform.position);
+                return true;
             }
-            _visual.Hide();
-            _visual.transform.SetParent(null);
-            transform.position = _visual.transform.position;
-            transform.position = ModBrickMetrics.RoundToGrid(transform.position);
+            return false;
         }
 
 

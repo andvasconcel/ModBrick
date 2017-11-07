@@ -53,11 +53,15 @@ namespace ModBrick
             }
         }
 
-		public void Place()
+		public bool Place()
 		{
-			_brickSnap.Snap();
-			var grid = gameObject.AddComponent<ModBrickGrid>();
-			grid.SetSize(BrickSize.Value); // todo: reactive magic
+			if(_brickSnap.Snap())
+            {
+                var grid = gameObject.AddComponent<ModBrickGrid>();
+                grid.SetSize(BrickSize.Value); // todo: reactive magic
+                return true;
+            }
+            return false;
 		}
 
         public void SetColor(Color color)

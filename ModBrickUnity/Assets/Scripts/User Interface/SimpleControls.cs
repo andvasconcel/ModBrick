@@ -18,7 +18,7 @@ namespace ModBrick.UserInterface
 
         void Update()
         {
-            if (Input.GetKeyDown(KeyCode.N))
+            if (Input.GetKeyDown(KeyCode.N) && _currentBrick == null)
             {
                 _currentBrick = Instantiate(_modBrickPrefab, new Vector3(0, ModBrickMetrics.FullHeight, 0), Quaternion.identity);
             }
@@ -57,8 +57,10 @@ namespace ModBrick.UserInterface
 
         private void PlaceBrick()
         {
-            _currentBrick.Place();
-            _currentBrick = null;
+            if(_currentBrick.Place())
+            {
+                _currentBrick = null;
+            }
         }
 
 
