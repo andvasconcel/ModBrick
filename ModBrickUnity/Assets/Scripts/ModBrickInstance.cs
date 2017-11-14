@@ -53,6 +53,15 @@ namespace ModBrick
             }
         }
 
+        public void Rotate()
+        {
+            var oldLength = _length;
+            var oldWidth = _width;
+            _length = oldWidth;
+            _width = oldLength;
+            OnValidate();
+        }
+
 		public bool Place()
 		{
 			if(_brickSnap.Snap())

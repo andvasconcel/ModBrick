@@ -34,5 +34,10 @@ namespace ModBrick
 		{
 			return Mathf.Round(value/N)*N;
 		}
+
+		public static int TubeLocalToGridPos(float value)
+		{
+			return Mathf.RoundToInt((value-(Unit/2f))/Unit);
+		}
     }
 }

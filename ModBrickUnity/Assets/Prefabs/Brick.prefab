@@ -113,13 +113,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _brickMesh: {fileID: 114973113966023228}
   _brickSnap: {fileID: 114620853530291990}
-  _length: 4
+  _length: 3
   _height: 3
-  _width: 2
+  _width: 3
   _renderer: {fileID: 23346503414362044}
-  Length: 4
+  Length: 3
   Height: 3
-  Width: 2
+  Width: 3
 --- !u!114 &114620853530291990
 MonoBehaviour:
   m_ObjectHideFlags: 1

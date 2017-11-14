@@ -14,7 +14,8 @@ namespace ModBrick
     {
         [SerializeField] private ModBrickSnapVisual _visualPrefab;
         [Header("Debugging")]
-        [SerializeField] private GameObject _debugSnapCell;
+        [SerializeField]
+        private GameObject _debugSnapCell;
         [SerializeField] private bool _showSnapCells;
         [SerializeField] private bool _showPotentialStudTargets;
         private List<GameObject> _snapCellVisuals;
@@ -35,6 +36,8 @@ namespace ModBrick
         private List<ModBrickCell> _potentialGridCellsWorld;
         private ModBrickCell _potentialBestSnapCell;
         private List<Vector3I> _potentialGridCells;
+
+        private Vector3 _averagePotentialGridCellsWorldPosition;
 
 
         public void Init(ModBrickInstance parent)
@@ -69,6 +72,7 @@ namespace ModBrick
                 {
                     _visual.UpdatePosition(newPosition);
                 }
+                //_visual.gameObject.transform.rotation = transform.rotation;
             }
             else
             {
@@ -77,7 +81,7 @@ namespace ModBrick
                     Destroy(_visual.gameObject);
                 }
             }
-            HandleSnapCellVisuals(); 
+            HandleSnapCellVisuals();
         }
 
         private void SetSize()
@@ -120,7 +124,8 @@ namespace ModBrick
             }
             if (_potentialGridCellsWorld != null && _potentialGridCellsWorld.Count != 0)
             {
-                position = ChooseBestSnappingPosition();
+                position = ChooseBestSnappingPositionNew();
+                _averagePotentialGridCellsWorldPosition = ChooseBestSnappingPositionNew();
                 return true;
             }
             else
@@ -131,12 +136,32 @@ namespace ModBrick
             return false;
         }
 
+        private Vector3 ChooseBestSnappingPositionNew()
+        {
+            var highestCellY = _potentialGridCellsWorld.Max(x => x.WorldPos.y);
+            var highestCells = _potentialGridCellsWorld.Where(x => x.WorldPos.y == highestCellY).ToList();
+
+            var total = Vector3.zero;
+            foreach (var p in highestCells)
+            {
+                total += p.WorldPos;
+            }
+            var avgPosition = total / highestCells.Count;
+            var avgZIndex = (float)highestCells.Select(x => ModBrickMetrics.TubeLocalToGridPos(x.TubeLocalPos.z)).Average();
+            var avgXIndex = (float)highestCells.Select(x => ModBrickMetrics.TubeLocalToGridPos(x.TubeLocalPos.x)).Average();
+            avgPosition.x = avgPosition.x - avgXIndex*ModBrickMetrics.Unit - ModBrickMetrics.Unit/2;
+            avgPosition.y = avgPosition.y - ModBrickMetrics.ThirdHeight / 2;
+            avgPosition.z = avgPosition.z - avgZIndex*ModBrickMetrics.Unit - ModBrickMetrics.Unit/2;
+            return avgPosition;
+        }
+
         private Vector3 ChooseBestSnappingPosition()
         {
             var bestSnap = _potentialGridCellsWorld.Min(x => x.Distance); // todo: check up on this
             _potentialBestSnapCell = _potentialGridCellsWorld.FirstOrDefault(x => x.Distance == bestSnap);
+
             _currentGrid = _potentialBestSnapCell.CellGrid;
-            
+
             // get the world position of that snappable stud:
             Vector3 position = _potentialBestSnapCell.WorldPos;
 
@@ -164,12 +189,12 @@ namespace ModBrick
 
         private void HandleSnapCellVisuals()
         {
-            if(_showSnapCells && _snapCellVisuals == null)
+            if (_showSnapCells && _snapCellVisuals == null)
             {
                 _snapCellVisuals = new List<GameObject>();
                 ShowSnapCells();
             }
-            else if(!_showSnapCells && _snapCellVisuals != null)
+            else if (!_showSnapCells && _snapCellVisuals != null)
             {
                 HideSnapCells();
                 _snapCellVisuals = null;
@@ -186,13 +211,13 @@ namespace ModBrick
         private bool CanSnap(List<ModBrickCell> potentialSnapCellsSameLevel)
         {
             // if they stud count is not the same as the inverse-stud count, that means we are colliding with something
-            if(_potentialGridCellsWorld.Count != _bottomSnapCells.Count)
+            if (_potentialGridCellsWorld.Count != _bottomSnapCells.Count)
             {
                 return false;
             }
-            foreach(var c in potentialSnapCellsSameLevel)
+            foreach (var c in potentialSnapCellsSameLevel)
             {
-                if(c.CellGrid.IsTaken(c.GridPos))
+                if (c.CellGrid.IsTaken(c.GridPos))
                 {
                     return false;
                 }
@@ -204,9 +229,9 @@ namespace ModBrick
         public bool Snap()
         {
             var cellsToTake = GetCellsToTake();
-            if(CanSnap(cellsToTake))
+            if (CanSnap(cellsToTake))
             {
-                foreach(var c in cellsToTake)
+                foreach (var c in cellsToTake)
                 {
                     c.CellGrid.TakeSpace(c.GridPos);
                 }
@@ -225,13 +250,14 @@ namespace ModBrick
 
         private void OnDrawGizmos()
         {
-            if(_showPotentialStudTargets)
+            if (_showPotentialStudTargets)
             {
-                foreach(var v in _potentialGridCellsWorld)
+                foreach (var v in _potentialGridCellsWorld)
                 {
                     Gizmos.DrawLine(v.WorldPos, v.TubeWorldPos);
                 }
             }
+            Gizmos.DrawSphere(_averagePotentialGridCellsWorldPosition, 2f);
         }
 
         private void ShowSnapCells()
@@ -248,7 +274,7 @@ namespace ModBrick
 
         private void HideSnapCells()
         {
-            foreach(var c in _snapCellVisuals)
+            foreach (var c in _snapCellVisuals)
             {
                 Destroy(c);
             }

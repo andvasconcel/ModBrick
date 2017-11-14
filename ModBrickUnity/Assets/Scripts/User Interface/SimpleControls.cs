@@ -51,7 +51,7 @@ namespace ModBrick.UserInterface
 		{
 			if(Input.GetKeyDown(KeyCode.R))
 			{
-				_currentBrick.gameObject.transform.Rotate(0, 90, 0);
+				_currentBrick.Rotate();
 			}
 		}
 
