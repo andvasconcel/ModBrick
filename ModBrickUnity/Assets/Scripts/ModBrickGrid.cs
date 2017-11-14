@@ -21,6 +21,19 @@ namespace ModBrick
         private float _ySize = ModBrickMetrics.ThirdHeight;
         private float _zSize = ModBrickMetrics.Unit;
 
+        private ModBrickInstance _modBrickInstance;
+        public ModBrickInstance ModBrickInstance
+        {
+            get
+            {
+                if(_modBrickInstance == null)
+                {
+                    _modBrickInstance = GetComponent<ModBrickInstance>();
+                }
+                return _modBrickInstance;
+            }
+        }
+
         private bool[,,] _grid;
 
         public void SetSize(Vector3I size)

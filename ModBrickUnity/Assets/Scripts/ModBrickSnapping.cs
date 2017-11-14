@@ -21,7 +21,7 @@ namespace ModBrick
         private List<GameObject> _snapCellVisuals;
 
         private bool _snapped = false;
-        private ModBrickInstance _parent;
+        private ModBrickInstance _modBrickInstance;
         private ModBrickSnapVisual _visual;
         private ModBrickGrid _currentGrid;
 
@@ -37,13 +37,10 @@ namespace ModBrick
         private ModBrickCell _potentialBestSnapCell;
         private List<Vector3I> _potentialGridCells;
 
-        private Vector3 _averagePotentialGridCellsWorldPosition;
-
-
-        public void Init(ModBrickInstance parent)
+        public void Init(ModBrickInstance modBrickInstance)
         {
-            _parent = parent;
-            _parent.BrickSize.Subscribe(size =>
+            _modBrickInstance = modBrickInstance;
+            _modBrickInstance.BrickSize.Subscribe(size =>
             {
                 BrickResized();
             });
@@ -56,7 +53,7 @@ namespace ModBrick
                 _visual = Instantiate(_visualPrefab, transform.position, transform.rotation);
                 _visual.transform.SetParent(null);
             }
-            _visual.SetMesh(_parent.BrickMesh.GetMesh());
+            _visual.SetMesh(_modBrickInstance.BrickMesh.GetMesh());
             _visual.Show();
             SetSize();
             GenerateCells();
@@ -86,9 +83,9 @@ namespace ModBrick
 
         private void SetSize()
         {
-            _length = _parent.BrickSize.Value.x;
-            _height = _parent.BrickSize.Value.y;
-            _width = _parent.BrickSize.Value.z;
+            _length = _modBrickInstance.BrickSize.Value.x;
+            _height = _modBrickInstance.BrickSize.Value.y;
+            _width = _modBrickInstance.BrickSize.Value.z;
         }
 
         private bool SnapUpdate(out Vector3 position)
@@ -125,7 +122,6 @@ namespace ModBrick
             if (_potentialGridCellsWorld != null && _potentialGridCellsWorld.Count != 0)
             {
                 position = ChooseBestSnappingPositionNew();
-                _averagePotentialGridCellsWorldPosition = ChooseBestSnappingPositionNew();
                 return true;
             }
             else
@@ -228,25 +224,37 @@ namespace ModBrick
         // return true if success, false if failure
         public bool Snap()
         {
+
             var cellsToTake = GetCellsToTake();
             if (CanSnap(cellsToTake))
             {
+                var parents = new List<ModBrickInstance>();
                 foreach (var c in cellsToTake)
                 {
+                    parents.Add(c.CellGrid.ModBrickInstance);
                     c.CellGrid.TakeSpace(c.GridPos);
+                }
+                parents = parents.Distinct().ToList();
+                foreach(var p in parents)
+                {
+                    p.AddChild(_modBrickInstance);
                 }
                 _visual.Hide();
                 _visual.transform.SetParent(null);
                 transform.position = _visual.transform.position;
                 transform.position = ModBrickMetrics.RoundToGrid(transform.position);
+                transform.SetParent(parents.FirstOrDefault().transform);
+                _modBrickInstance.SetParents(parents);
                 _snapped = true;
                 return true;
             }
             return false;
         }
 
-
-        // debugging methods
+        public void Unsnap()
+        {
+            _snapped = false;
+        }
 
         private void OnDrawGizmos()
         {
@@ -257,7 +265,6 @@ namespace ModBrick
                     Gizmos.DrawLine(v.WorldPos, v.TubeWorldPos);
                 }
             }
-            Gizmos.DrawSphere(_averagePotentialGridCellsWorldPosition, 2f);
         }
 
         private void ShowSnapCells()

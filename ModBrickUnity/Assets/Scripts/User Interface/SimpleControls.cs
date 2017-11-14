@@ -10,25 +10,65 @@ namespace ModBrick.UserInterface
         [SerializeField] private ModBrickInstance _modBrickPrefab;
         [SerializeField] private float _speed;
         private ModBrickInstance _currentBrick;
+        [SerializeField] private Material _brickMaterial;
+        [SerializeField] private Material _selectedMaterial;
 
-        void Start()
+        private void SwitchBrick(ModBrickInstance newBrick)
         {
-
+            if(_currentBrick != null)
+            {
+                _currentBrick.SetMaterial(_brickMaterial);
+            }
+            _currentBrick = newBrick;
+            _currentBrick.SetMaterial(_selectedMaterial);
         }
+
+        private void RotateCamera(Vector2 mousePosition)
+        {
+            
+        }
+
 
         void Update()
         {
-            if (Input.GetKeyDown(KeyCode.N) && _currentBrick == null)
+            if(Input.GetMouseButtonDown(0))
+            {
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hit;
+                if (Physics.Raycast(ray, out hit)) 
+                {
+                    ModBrickInstance brick = hit.transform.gameObject.GetComponent<ModBrickInstance>();
+                    if(brick != null && brick.Selectable)
+                    {
+                        SwitchBrick(brick);
+                    }
+                }
+            }
+            else if(Input.GetMouseButton(1))
+            {
+                RotateCamera(Input.mousePosition);
+            }
+
+
+            if (Input.GetKeyDown(KeyCode.N) && (_currentBrick == null || _currentBrick.Placed))
             {
                 _currentBrick = Instantiate(_modBrickPrefab, new Vector3(0, ModBrickMetrics.FullHeight, 0), Quaternion.identity);
+                _currentBrick.SetMaterial(_selectedMaterial);
             }
             if (_currentBrick != null)
             {
-                DoTranslate();
-				DoRotate();
+                if(!_currentBrick.Placed)
+                {
+                    DoTranslate();
+				    DoRotate();
+                }
                 if (Input.GetKeyDown(KeyCode.P))
                 {
 					PlaceBrick();
+                }
+                if(Input.GetKeyDown(KeyCode.F))
+                {
+                    FreeBrick();
                 }
             }
         }
@@ -59,7 +99,16 @@ namespace ModBrick.UserInterface
         {
             if(_currentBrick.Place())
             {
+                _currentBrick.SetMaterial(_brickMaterial);
                 _currentBrick = null;
+            }
+        }
+
+        private void FreeBrick()
+        {
+            if(_currentBrick.Free())
+            {
+                // ?
             }
         }
 
