@@ -124,6 +124,7 @@ GameObject:
   - component: {fileID: 254344213}
   - component: {fileID: 254344212}
   - component: {fileID: 254344211}
+  - component: {fileID: 254344216}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -170,7 +171,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 2000
-  field of view: 30
+  field of view: 56
   orthographic: 0
   orthographic size: 100
   m_Depth: -1
@@ -193,48 +194,19 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 254344210}
-  m_LocalRotation: {x: 0.35355338, y: 0.35355338, z: -0.1464466, w: 0.8535535}
-  m_LocalPosition: {x: -100, y: 200, z: -100}
+  m_LocalRotation: {x: 0.27059805, y: 0.6532815, z: -0.27059805, w: 0.6532815}
+  m_LocalPosition: {x: 162, y: 100, z: 62}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 45, y: 45, z: 0}
---- !u!1 &659286932
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 659286933}
-  - component: {fileID: 659286934}
-  m_Layer: 0
-  m_Name: Controls
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &659286933
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 659286932}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 11.412668, y: 22.764208, z: 17.43219}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &659286934
+  m_LocalEulerAnglesHint: {x: 45.000004, y: 90, z: 0}
+--- !u!114 &254344216
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 659286932}
+  m_GameObject: {fileID: 254344210}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 139ee4ed24a214429a9dd8ae403896bf, type: 3}
@@ -243,6 +215,9 @@ MonoBehaviour:
   _modBrickPrefab: {fileID: 114038029149485590, guid: 59a86ed94dfeb4a9bb227c2a5f0c51d7,
     type: 2}
   _speed: 30
+  _cameraLookTarget: {fileID: 1553705022}
+  _brickMaterial: {fileID: 2100000, guid: dbf30b8d55da14257a589814e3f09265, type: 2}
+  _selectedMaterial: {fileID: 2100000, guid: 75cb6be7fa0184eaa8de1dffda504308, type: 2}
 --- !u!1 &1456018131
 GameObject:
   m_ObjectHideFlags: 0
