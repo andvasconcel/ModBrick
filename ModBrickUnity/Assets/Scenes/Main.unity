@@ -125,6 +125,7 @@ GameObject:
   - component: {fileID: 254344212}
   - component: {fileID: 254344211}
   - component: {fileID: 254344216}
+  - component: {fileID: 254344217}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -195,7 +196,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 254344210}
   m_LocalRotation: {x: 0.27059805, y: 0.6532815, z: -0.27059805, w: 0.6532815}
-  m_LocalPosition: {x: 162, y: 100, z: 62}
+  m_LocalPosition: {x: 63, y: 100, z: 163}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -218,6 +219,17 @@ MonoBehaviour:
   _cameraLookTarget: {fileID: 1553705022}
   _brickMaterial: {fileID: 2100000, guid: dbf30b8d55da14257a589814e3f09265, type: 2}
   _selectedMaterial: {fileID: 2100000, guid: 75cb6be7fa0184eaa8de1dffda504308, type: 2}
+--- !u!114 &254344217
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 254344210}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bda2ba9390dab480bbc02a45c245c67e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1456018131
 GameObject:
   m_ObjectHideFlags: 0
